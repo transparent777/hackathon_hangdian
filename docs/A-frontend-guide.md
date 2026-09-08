@@ -16,9 +16,15 @@
 1. 打开 https://mp.weixin.qq.com
 2. 注册 → 选择 **小程序**（个人或团队主体都行）
 3. 登录后台 → **开发管理 → 开发设置** → 复制 **AppID**
-4. 把 `miniprogram/project.config.json` 里的 `"appid": "请替换为你的AppID"` 改成你的 AppID
+4. 复制私有配置模板并填入 AppID（**不要写进会被 git 跟踪的文件**）：
 
-> 没 AppID 也能本地开发：开发者工具里选「测试号」或「不使用 AppID」。
+```bash
+cd miniprogram
+cp project.private.config.json.example project.private.config.json
+# 编辑 project.private.config.json，填入真实 AppID
+```
+
+> `project.private.config.json` 已在 `.gitignore` 中。`project.config.json` 保持占位符即可。
 
 ### 步骤 2：安装微信开发者工具（约 15 分钟）
 
