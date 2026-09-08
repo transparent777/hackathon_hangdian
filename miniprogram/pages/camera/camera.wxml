@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="card">
+    <view class="title">和 {{characterName}} 合影</view>
+    <view class="subtitle">拍一张或从相册选一张，AI 会把 TA 溶进你的场景</view>
+  </view>
+
+  <view class="preview card" wx:if="{{imagePath}}">
+    <image class="preview-image" src="{{imagePath}}" mode="aspectFit" />
+  </view>
+
+  <view class="preview card empty" wx:else>
+    <view class="placeholder">还没有选图</view>
+  </view>
+
+  <van-button
+    class="primary-btn"
+    type="primary"
+    color="#6C5CE7"
+    block
+    round
+    bind:click="chooseImage"
+  >
+    拍照 / 从相册选择
+  </van-button>
+
+  <van-button
+    class="primary-btn"
+    type="default"
+    block
+    round
+    disabled="{{!imagePath || blending}}"
+    loading="{{blending}}"
+    bind:click="onBlend"
+  >
+    {{blending ? '溶图中...' : '开始溶图'}}
+  </van-button>
+
+  <view class="loading-tip" wx:if="{{blending}}">
+    <van-loading size="24px" color="#6C5CE7" />
+    <text>{{characterName}} 正在走向你的生活...</text>
+  </view>
+</view>

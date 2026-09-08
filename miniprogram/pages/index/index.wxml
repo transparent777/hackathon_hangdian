@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="card hero">
+    <view class="title">赛博陪伴相机</view>
+    <view class="subtitle">每天随机 roll 一只陪伴兽，溶进你的真实生活</view>
+  </view>
+
+  <view class="card companion" wx:if="{{companion}}">
+    <view class="roll-tag">今日陪伴兽 · {{companion.rarity}}</view>
+    <view class="emoji">{{companion.emoji}}</view>
+    <view class="name">{{companion.name}}</view>
+    <view class="quote">「{{companion.quote}}」</view>
+  </view>
+
+  <view class="card companion empty" wx:else>
+    <view class="emoji">🎲</view>
+    <view class="name">还没有 roll 哦</view>
+    <view class="quote">点下面按钮，召唤今天的赛博伙伴</view>
+  </view>
+
+  <van-button
+    class="primary-btn"
+    type="primary"
+    color="#6C5CE7"
+    block
+    round
+    loading="{{rolling}}"
+    bind:click="onRoll"
+  >
+    {{companion ? '重新 Roll' : 'Roll 今日陪伴兽'}}
+  </van-button>
+
+  <van-button
+    class="primary-btn"
+    type="default"
+    block
+    round
+    disabled="{{!companion}}"
+    bind:click="goCamera"
+  >
+    拍照溶图
+  </van-button>
+</view>

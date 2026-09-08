@@ -1,0 +1,21 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/camera/camera",
+    "pages/result/result"
+  ],
+  "window": {
+    "navigationBarTitleText": "赛博陪伴相机",
+    "navigationBarBackgroundColor": "#6C5CE7",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F7F8FC",
+    "backgroundTextStyle": "light"
+  },
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-toast": "@vant/weapp/toast/index"
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

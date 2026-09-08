@@ -1,0 +1,8 @@
+{
+  "description": "项目私有配置文件",
+  "projectname": "cyber-companion",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false
+  }
+}
