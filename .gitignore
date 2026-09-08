@@ -1,0 +1,111 @@
+# =========================
+# 依赖（不要提交）
+# =========================
+node_modules/
+miniprogram/node_modules/
+miniprogram/miniprogram_npm/
+**/miniprogram_npm/
+
+# =========================
+# 密钥 & 环境变量（最重要）
+# =========================
+.env
+.env.*
+
+# 本地密钥配置文件
+**/secrets.json
+**/secrets.yaml
+**/secrets.yml
+**/config.local.js
+**/config.local.json
+**/*.local.json
+**/*.local.js
+
+# AI / 云服务凭证（B、C 会用到）
+ai/.credentials/
+ai/credentials.*
+server/.credentials/
+server/credentials.*
+
+# Postman / Apifox 环境文件（常含 API Key）
+*postman_environment*.json
+*.apifox.json
+
+# =========================
+# 微信小程序私有配置（含 AppID）
+# =========================
+miniprogram/project.private.config.json
+**/project.private.config.json
+
+# 微信上传密钥（若使用 CI 上传）
+private.*.key
+
+# =========================
+# 日志 & 临时文件
+# =========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.tmp/
+temp/
+cache/
+
+# =========================
+# 构建产物
+# =========================
+dist/
+build/
+.output/
+.serverless/
+
+# =========================
+# 操作系统
+# =========================
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =========================
+# IDE / 编辑器
+# =========================
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# VS Code：忽略个人配置，保留推荐扩展（可选）
+.vscode/*
+!.vscode/extensions.json
+
+# Cursor
+.cursor/
+
+# =========================
+# 测试 & 覆盖率
+# =========================
+coverage/
+.nyc_output/
+
+# =========================
+# 其他敏感或大文件（按需）
+# =========================
+# 用户上传的测试原图（若放本地调试）
+uploads/
+**/uploads/*
+!**/uploads/.gitkeep
+
+# 打包压缩包
+*.zip
+*.tar.gz
+*.rar
+
+# 证书
+*.pem
+*.p12
+*.pfx

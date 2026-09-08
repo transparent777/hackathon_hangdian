@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "陪伴瞬间",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index"
+  }
+}

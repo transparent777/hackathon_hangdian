@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "今日陪伴兽",
+  "usingComponents": {
+    "van-button": "@vant/weapp/button/index"
+  }
+}
