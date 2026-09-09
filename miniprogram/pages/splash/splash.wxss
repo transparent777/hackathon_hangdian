@@ -1,0 +1,265 @@
+.splash {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #fff9f0 0%, #fff3e0 100%);
+  z-index: 9999;
+}
+
+.splash--leave {
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+
+.splash-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.35;
+  animation: float 3s ease-in-out infinite;
+}
+
+.blob-1 {
+  width: 280rpx;
+  height: 280rpx;
+  top: 8%;
+  left: -60rpx;
+  background: #ffe66d;
+  animation-delay: 0s;
+}
+
+.blob-2 {
+  width: 200rpx;
+  height: 200rpx;
+  top: 18%;
+  right: -40rpx;
+  background: #74b9ff;
+  animation-delay: 0.4s;
+}
+
+.blob-3 {
+  width: 160rpx;
+  height: 160rpx;
+  bottom: 22%;
+  left: 20%;
+  background: #ff6b6b;
+  animation-delay: 0.8s;
+}
+
+.splash-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80rpx 48rpx;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translateY(40rpx);
+}
+
+.splash-content--in {
+  animation: content-in 0.6s ease forwards;
+}
+
+.logo-wrap {
+  margin-bottom: 32rpx;
+  animation: pop-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+.camera-icon {
+  position: relative;
+  width: 120rpx;
+  height: 96rpx;
+}
+
+.camera-body {
+  width: 120rpx;
+  height: 80rpx;
+  border: 4rpx solid #2d3436;
+  border-radius: 20rpx;
+  background: #6c5ce7;
+  box-shadow: 0 10rpx 0 rgba(45, 52, 54, 0.12);
+}
+
+.camera-lens {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -40%);
+  width: 44rpx;
+  height: 44rpx;
+  border: 4rpx solid #2d3436;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.camera-flash {
+  position: absolute;
+  top: 12rpx;
+  right: 16rpx;
+  width: 16rpx;
+  height: 16rpx;
+  border: 3rpx solid #2d3436;
+  border-radius: 4rpx;
+  background: #ffe66d;
+}
+
+.brand-title {
+  font-size: 48rpx;
+  font-weight: 800;
+  color: #2d3436;
+  letter-spacing: 4rpx;
+  animation: pop-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
+}
+
+.brand-tag {
+  margin-top: 12rpx;
+  padding: 8rpx 24rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #2d3436;
+  background: #ffe66d;
+  border: 3rpx solid #2d3436;
+  border-radius: 999rpx;
+  animation: pop-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+}
+
+.companions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 24rpx;
+  margin-top: 56rpx;
+  height: 160rpx;
+}
+
+.companion {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  border: 4rpx solid #2d3436;
+  background: #fff;
+  box-shadow: 0 8rpx 0 rgba(45, 52, 54, 0.1);
+  opacity: 0;
+  transform: scale(0) translateY(40rpx);
+}
+
+.companion-1 {
+  animation: companion-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.65s both;
+}
+
+.companion-2 {
+  width: 120rpx;
+  height: 120rpx;
+  animation: companion-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.85s both;
+}
+
+.companion-3 {
+  animation: companion-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 1.05s both;
+}
+
+.loading-line {
+  width: 320rpx;
+  height: 12rpx;
+  margin-top: 64rpx;
+  border: 3rpx solid #2d3436;
+  border-radius: 999rpx;
+  overflow: hidden;
+  background: #fff;
+  opacity: 0;
+  animation: fade-in 0.4s ease 1.2s forwards;
+}
+
+.loading-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #6c5ce7, #74b9ff);
+  border-radius: 999rpx;
+  animation: loading-progress 1.2s ease 1.3s forwards;
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  color: #636e72;
+  opacity: 0;
+  animation: fade-in 0.4s ease 1.35s forwards;
+}
+
+.skip-hint {
+  position: fixed;
+  bottom: 64rpx;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 22rpx;
+  color: #b2bec3;
+  opacity: 0;
+  animation: fade-in 0.4s ease 1.8s forwards;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16rpx);
+  }
+}
+
+@keyframes content-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6) rotate(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes companion-in {
+  from {
+    opacity: 0;
+    transform: scale(0) translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loading-progress {
+  to {
+    width: 100%;
+  }
+}
