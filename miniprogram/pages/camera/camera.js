@@ -1,17 +1,22 @@
 const { fetchBlend } = require('../../utils/api')
+const { getCharacterById } = require('../../utils/characters')
+const { addHistory } = require('../../utils/history')
 
 Page({
   data: {
     characterId: '',
     characterName: '',
+    characterImage: '',
     imagePath: '',
     blending: false
   },
 
   onLoad(options) {
+    const character = getCharacterById(options.characterId || 'naiwa')
     this.setData({
-      characterId: options.characterId || 'naiwa',
-      characterName: options.name || '陪伴兽'
+      characterId: character.characterId,
+      characterName: options.name || character.name,
+      characterImage: decodeURIComponent(options.image || '') || character.image
     })
   },
 
@@ -32,14 +37,25 @@ Page({
   },
 
   async onBlend() {
-    const { characterId, imagePath, characterName } = this.data
-    if (!imagePath) return
+    const { characterId, imagePath, characterName, characterImage } = this.data
+    if (!imagePath) {
+      wx.showToast({ title: '请先选一张图', icon: 'none' })
+      return
+    }
 
     this.setData({ blending: true })
     try {
       const result = await fetchBlend({ characterId, imagePath })
+      await addHistory({
+        characterId,
+        characterName,
+        characterImage,
+        imageUrl: result.resultUrl,
+        quote: result.companionText
+      })
+
       wx.navigateTo({
-        url: `/pages/result/result?imageUrl=${encodeURIComponent(result.resultUrl)}&quote=${encodeURIComponent(result.companionText)}&name=${encodeURIComponent(characterName)}`
+        url: `/pages/result/result?imageUrl=${encodeURIComponent(result.resultUrl)}&quote=${encodeURIComponent(result.companionText)}&name=${encodeURIComponent(characterName)}&characterId=${characterId}&characterImage=${encodeURIComponent(characterImage)}`
       })
     } catch (error) {
       wx.showToast({ title: '溶图失败，请重试', icon: 'none' })

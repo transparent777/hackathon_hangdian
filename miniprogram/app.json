@@ -6,15 +6,18 @@
   ],
   "window": {
     "navigationBarTitleText": "赛博陪伴相机",
-    "navigationBarBackgroundColor": "#6C5CE7",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#F7F8FC",
-    "backgroundTextStyle": "light"
+    "navigationBarBackgroundColor": "#FFF9F0",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFF9F0",
+    "backgroundTextStyle": "dark"
   },
   "usingComponents": {
     "van-button": "@vant/weapp/button/index",
     "van-loading": "@vant/weapp/loading/index",
-    "van-toast": "@vant/weapp/toast/index"
+    "van-toast": "@vant/weapp/toast/index",
+    "van-tag": "@vant/weapp/tag/index",
+    "van-overlay": "@vant/weapp/overlay/index",
+    "van-icon": "@vant/weapp/icon/index"
   },
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents"

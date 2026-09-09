@@ -1,42 +1,74 @@
-<view class="container">
-  <view class="card hero">
-    <view class="title">赛博陪伴相机</view>
-    <view class="subtitle">每天随机 roll 一只陪伴兽，溶进你的真实生活</view>
+<view class="page-bg">
+  <view class="container">
+    <view class="card hero card--tilt-left">
+      <view class="hero-top">
+        <view class="doodle-dot"></view>
+        <van-tag color="#FFE66D" text-color="#2D3436" custom-class="hero-tag">CYBER PET</van-tag>
+      </view>
+      <view class="brand-title">赛博陪伴相机</view>
+      <view class="brand-subtitle">每天 roll 一只陪伴兽，溶进你的真实生活</view>
+    </view>
+
+    <view class="card companion card--tilt-right" wx:if="{{companion}}" style="background: {{companion.accent}}22;">
+      <van-tag color="{{companion.rarityColor}}" custom-class="rarity-tag">今日 · {{companion.rarity}}</van-tag>
+      <view class="portrait-wrap">
+        <image class="portrait" src="{{companion.image}}" mode="aspectFill" />
+      </view>
+      <view class="name">{{companion.name}}</view>
+      <view class="quote">「{{companion.quote}}」</view>
+    </view>
+
+    <view class="card companion empty card--tilt-right" wx:else>
+      <view class="empty-icon">?</view>
+      <view class="name">还没有 roll 哦</view>
+      <view class="quote">点下面按钮，召唤今天的赛博伙伴</view>
+    </view>
+
+    <van-button
+      class="primary-btn"
+      type="primary"
+      color="#6C5CE7"
+      block
+      round
+      loading="{{rolling}}"
+      bind:click="onRoll"
+    >
+      {{companion ? '重新 Roll' : 'Roll 今日陪伴兽'}}
+    </van-button>
+
+    <van-button
+      class="primary-btn"
+      type="default"
+      custom-class="outline-btn"
+      block
+      round
+      disabled="{{!companion}}"
+      bind:click="goCamera"
+    >
+      拍照溶图
+    </van-button>
+
+    <view class="section-label" wx:if="{{history.length}}">最近陪伴</view>
+    <view class="history-list" wx:if="{{history.length}}">
+      <view
+        class="history-item card"
+        wx:for="{{history}}"
+        wx:key="id"
+        data-item="{{item}}"
+        bind:tap="openHistory"
+      >
+        <image class="history-thumb" src="{{item.imageUrl}}" mode="aspectFill" />
+        <view class="history-meta">
+          <view class="history-name">{{item.characterName}}</view>
+          <view class="history-quote">{{item.quote}}</view>
+        </view>
+        <van-icon name="arrow" color="#636E72" size="16px" />
+      </view>
+    </view>
+
+    <view class="mock-tip card" wx:if="{{useMock}}">
+      <van-icon name="info-o" size="14px" color="#6C5CE7" />
+      <text>当前为 Mock 模式，B 接口就绪后改 app.js 的 useMock</text>
+    </view>
   </view>
-
-  <view class="card companion" wx:if="{{companion}}">
-    <view class="roll-tag">今日陪伴兽 · {{companion.rarity}}</view>
-    <view class="emoji">{{companion.emoji}}</view>
-    <view class="name">{{companion.name}}</view>
-    <view class="quote">「{{companion.quote}}」</view>
-  </view>
-
-  <view class="card companion empty" wx:else>
-    <view class="emoji">🎲</view>
-    <view class="name">还没有 roll 哦</view>
-    <view class="quote">点下面按钮，召唤今天的赛博伙伴</view>
-  </view>
-
-  <van-button
-    class="primary-btn"
-    type="primary"
-    color="#6C5CE7"
-    block
-    round
-    loading="{{rolling}}"
-    bind:click="onRoll"
-  >
-    {{companion ? '重新 Roll' : 'Roll 今日陪伴兽'}}
-  </van-button>
-
-  <van-button
-    class="primary-btn"
-    type="default"
-    block
-    round
-    disabled="{{!companion}}"
-    bind:click="goCamera"
-  >
-    拍照溶图
-  </van-button>
 </view>

@@ -2,6 +2,8 @@
   "navigationBarTitleText": "拍照溶图",
   "usingComponents": {
     "van-button": "@vant/weapp/button/index",
-    "van-loading": "@vant/weapp/loading/index"
+    "van-loading": "@vant/weapp/loading/index",
+    "van-overlay": "@vant/weapp/overlay/index",
+    "van-icon": "@vant/weapp/icon/index"
   }
 }
