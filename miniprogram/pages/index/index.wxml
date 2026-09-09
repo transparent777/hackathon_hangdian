@@ -6,14 +6,9 @@
         wx:if="{{bannerSrc}}"
         class="hero-banner__img"
         src="{{bannerSrc}}"
-        mode="aspectFill"
+        mode="widthFix"
         binderror="onBannerError"
       />
-      <view class="hero-banner__overlay">
-        <view class="hero-banner__tag">CYBER PET</view>
-        <view class="hero-banner__title">赛博陪伴相机</view>
-        <view class="hero-banner__sub">把陪伴兽溶进你的生活</view>
-      </view>
     </view>
 
     <!-- 主 CTA：进入溶图 -->
@@ -41,8 +36,8 @@
       <view class="panel panel--companion card card--tilt-right">
         <view class="panel__label">今日陪伴兽</view>
         <block wx:if="{{companion}}">
-          <view class="companion-portrait">
-            <image class="companion-portrait__img" src="{{companion.image}}" mode="aspectFill" />
+          <view class="companion-cover">
+            <image class="companion-cover__img" src="{{companion.image}}" mode="aspectFit" />
           </view>
           <van-tag color="{{companion.rarityColor}}" custom-class="rarity-tag">{{companion.rarity}}</van-tag>
           <view class="companion-name">{{companion.name}}</view>

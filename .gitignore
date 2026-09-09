@@ -98,13 +98,11 @@ coverage/
 .nyc_output/
 
 # =========================
-# 素材库（本地参考图/大图，不提交）
+# 素材库（本地源文件，整目录不提交 Git）
 # =========================
+# 含：封面视频、主页 banner、陪伴兽原图、参考模板等
+# 小程序实际用的是 miniprogram/images/ 与 miniprogram/assets/ 里的副本
 素材库/
-**/素材库/**
-
-# 小程序内引用的图片可提交；若体积过大可改为忽略：
-# miniprogram/images/raw/
 
 # 开场视频高清源（本地备份，不提交）
 miniprogram/assets/splash/intro-source-*.mp4

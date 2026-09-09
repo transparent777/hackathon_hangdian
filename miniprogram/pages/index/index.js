@@ -1,6 +1,12 @@
 const { fetchRoll } = require('../../utils/api')
+const { getCharacterById } = require('../../utils/characters')
 const { getTodayCompanion, setTodayCompanion } = require('../../utils/daily')
 const { setTabBarIndex } = require('../../utils/tabbar')
+
+function normalizeCompanion(companion) {
+  if (!companion || !companion.characterId) return null
+  return getCharacterById(companion.characterId, companion.rarity || '普通')
+}
 
 const BANNER_FINAL = '/images/placeholders/home-banner.jpg'
 
@@ -20,9 +26,11 @@ Page({
     }
 
     const app = getApp()
-    const companion = app.globalData.todayCompanion || getTodayCompanion()
+    const raw = app.globalData.todayCompanion || getTodayCompanion()
+    const companion = normalizeCompanion(raw)
     if (companion) {
       app.globalData.todayCompanion = companion
+      setTodayCompanion(companion)
     }
 
     this.setData({ companion })
@@ -58,7 +66,7 @@ Page({
       return
     }
     wx.navigateTo({
-      url: `/pages/camera/camera?characterId=${companion.characterId}&name=${companion.name}&image=${encodeURIComponent(companion.image)}`
+      url: `/pages/camera/camera?characterId=${companion.characterId}&name=${companion.name}&rarity=${encodeURIComponent(companion.rarity)}&image=${encodeURIComponent(companion.image)}`
     })
   }
 })

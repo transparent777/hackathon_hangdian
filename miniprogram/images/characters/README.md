@@ -1,9 +1,14 @@
-# 角色展示图（提交到 Git）
+# 陪伴兽封面
 
-从项目根目录 `素材库/` 各选 1 张，压缩后放这里：
+按角色 + 稀有度存放，Roll 时自动切换：
 
-- `naiwa.png` — 奶娃
-- `doro.png` — doro
-- `maodie.png` — 耄耋
+```
+covers/
+├── naiwa/   normal.jpg  rare.jpg  legendary.jpg
+├── doro/
+└── maodie/
+```
 
-`素材库/` 已在 `.gitignore`，大图只留本地；这里只放小程序用的 3 张小图。
+源文件：`素材库/主页/陪伴兽/{奶蛙|doro|耄耋}/{普通|稀有|传说}.jpg`
+
+更新流程：改源图 → 用 Python/脚本复制到对应路径 → 重新编译。

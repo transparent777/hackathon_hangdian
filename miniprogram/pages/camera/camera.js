@@ -12,7 +12,8 @@ Page({
   },
 
   onLoad(options) {
-    const character = getCharacterById(options.characterId || 'naiwa')
+    const rarity = decodeURIComponent(options.rarity || '普通')
+    const character = getCharacterById(options.characterId || 'naiwa', rarity)
     this.setData({
       characterId: character.characterId,
       characterName: options.name || character.name,
