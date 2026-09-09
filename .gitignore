@@ -106,6 +106,7 @@ coverage/
 
 # 开场视频高清源（本地备份，不提交）
 miniprogram/assets/splash/intro-source-*.mp4
+miniprogram/node_modules/
 
 # =========================
 # 其他敏感或大文件（按需）

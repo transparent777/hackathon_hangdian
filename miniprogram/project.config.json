@@ -1,7 +1,13 @@
 {
   "description": "赛博陪伴相机",
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      { "type": "folder", "value": "node_modules" },
+      { "type": "suffix", "value": ".md" },
+      { "type": "suffix", "value": ".map" },
+      { "type": "glob", "value": "assets/splash/intro-source-*.mp4" },
+      { "type": "file", "value": "package-lock.json" }
+    ],
     "include": []
   },
   "setting": {
@@ -19,9 +25,9 @@
     "autoAudits": false,
     "newFeature": false,
     "uglifyFileName": false,
-    "uploadWithSourceMap": true,
+    "uploadWithSourceMap": false,
     "useIsolateContext": true,
-    "nodeModules": true,
+    "nodeModules": false,
     "enhance": true,
     "useMultiFrameRuntime": true,
     "useApiHook": true,
