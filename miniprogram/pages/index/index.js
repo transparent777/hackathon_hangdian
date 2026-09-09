@@ -12,7 +12,7 @@ Page({
   },
 
   onShow() {
-    setTabBarIndex(0)
+    setTabBarIndex(this, 0)
 
     if (!this._bannerChecked) {
       this._bannerChecked = true

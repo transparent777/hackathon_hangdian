@@ -17,7 +17,7 @@ Page({
   },
 
   onShow() {
-    setTabBarIndex(2)
+    setTabBarIndex(this, 2)
     this.setData({ useMock: getApp().globalData.useMock })
   }
 })

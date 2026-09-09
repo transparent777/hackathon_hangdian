@@ -8,7 +8,7 @@ Page({
   },
 
   onShow() {
-    setTabBarIndex(1)
+    setTabBarIndex(this, 1)
     this.setData({ history: getHistory() })
   },
 

@@ -31,7 +31,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6rpx;
+  min-height: 96rpx;
+  position: relative;
+  z-index: 1;
 }
 
 .tab-bar__text {
