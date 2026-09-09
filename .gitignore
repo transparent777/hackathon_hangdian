@@ -106,6 +106,9 @@ coverage/
 # 小程序内引用的图片可提交；若体积过大可改为忽略：
 # miniprogram/images/raw/
 
+# 开场视频高清源（本地备份，不提交）
+miniprogram/assets/splash/intro-source-*.mp4
+
 # =========================
 # 其他敏感或大文件（按需）
 # =========================
