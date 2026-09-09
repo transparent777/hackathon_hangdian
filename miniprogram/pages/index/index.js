@@ -2,6 +2,7 @@ const { fetchRoll } = require('../../utils/api')
 const { getCharacterById } = require('../../utils/characters')
 const { getTodayCompanion, setTodayCompanion } = require('../../utils/daily')
 const { setTabBarIndex } = require('../../utils/tabbar')
+const { shouldShowSplash, dismissSplash } = require('../../utils/splash-session')
 
 function normalizeCompanion(companion) {
   if (!companion || !companion.characterId) return null
@@ -14,14 +15,33 @@ Page({
   data: {
     companion: null,
     rolling: false,
-    bannerSrc: ''
+    bannerSrc: '',
+    showSplash: true
   },
 
   onLoad() {
-    this.setData({ bannerSrc: BANNER_FINAL })
+    this.setData({
+      bannerSrc: BANNER_FINAL,
+      showSplash: shouldShowSplash()
+    }, () => {
+      this.syncTabBarVisibility()
+    })
+  },
+
+  syncTabBarVisibility() {
+    const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null
+    if (tabBar) {
+      tabBar.setData({ hidden: this.data.showSplash })
+    }
   },
 
   onShow() {
+    if (shouldShowSplash() && !this.data.showSplash) {
+      this.setData({ showSplash: true })
+    }
+
+    this.syncTabBarVisibility()
+
     try {
       setTabBarIndex(this, 0)
     } catch (error) {
@@ -36,6 +56,13 @@ Page({
     }
 
     this.setData({ companion })
+  },
+
+  onSplashComplete() {
+    dismissSplash()
+    this.setData({ showSplash: false }, () => {
+      this.syncTabBarVisibility()
+    })
   },
 
   onBannerError() {

@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "首页",
   "usingComponents": {
+    "splash-overlay": "/components/splash-overlay/splash-overlay",
     "van-icon": "@vant/weapp/icon/index",
     "van-loading": "@vant/weapp/loading/index",
     "van-tag": "@vant/weapp/tag/index"

@@ -1,6 +1,6 @@
 {
+  "entryPagePath": "pages/index/index",
   "pages": [
-    "pages/splash/splash",
     "pages/index/index",
     "pages/history/history",
     "pages/me/me",

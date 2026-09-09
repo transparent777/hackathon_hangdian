@@ -1,7 +1,11 @@
-const { prepareSplashVideo } = require('../../utils/splash-video')
+const {
+  prepareSplashVideo,
+  invalidateSplashVideoCache
+} = require('../../utils/splash-video')
 
 const FALLBACK_DURATION = 1800
 const MAX_DURATION = 20000
+const AUTOPLAY_WAIT_MS = 2000
 
 Page({
   data: {
@@ -10,32 +14,35 @@ Page({
     leaving: false,
     useFallback: false,
     preparing: true,
+    needTapPlay: false,
     statusText: '加载开场动画...'
   },
 
   onLoad() {
     this._navigated = false
+    this._retryCount = 0
+    this._played = false
     this._timer = setTimeout(() => this.goHome(), MAX_DURATION)
     this.initVideo()
   },
 
   async initVideo() {
+    this.clearAutoplayTimer()
+
     try {
-      const videoSrc = await prepareSplashVideo()
+      const force = this._retryCount > 0
+      const videoSrc = await prepareSplashVideo({ force })
       this.setData({
         videoSrc,
         preparing: false,
+        needTapPlay: false,
         statusText: ''
       })
+      this.scheduleAutoplayCheck()
       this.playVideo()
     } catch (error) {
       console.error('prepare splash video failed', error)
-      this.setData({
-        useFallback: true,
-        preparing: false,
-        statusText: '动画加载失败，正在进入...'
-      })
-      this._fallbackTimer = setTimeout(() => this.goHome(), FALLBACK_DURATION)
+      this.enterFallback('动画加载失败，正在进入...')
     }
   },
 
@@ -58,6 +65,25 @@ Page({
       clearTimeout(this._fallbackTimer)
       this._fallbackTimer = null
     }
+    this.clearAutoplayTimer()
+  },
+
+  clearAutoplayTimer() {
+    if (this._autoplayTimer) {
+      clearTimeout(this._autoplayTimer)
+      this._autoplayTimer = null
+    }
+  },
+
+  scheduleAutoplayCheck() {
+    this.clearAutoplayTimer()
+    this._autoplayTimer = setTimeout(() => {
+      if (this._played || this.data.useFallback || this._navigated) return
+      this.setData({
+        needTapPlay: true,
+        statusText: '点击屏幕播放开场动画'
+      })
+    }, AUTOPLAY_WAIT_MS)
   },
 
   playVideo() {
@@ -69,6 +95,11 @@ Page({
     })
   },
 
+  onTapPlay() {
+    this.setData({ needTapPlay: false, statusText: '' })
+    this.playVideo()
+  },
+
   onVideoLoadedMeta(event) {
     const { width, height } = event.detail
     if (!width || !height) return
@@ -76,9 +107,6 @@ Page({
     const { windowWidth, windowHeight } = wx.getWindowInfo()
     const videoRatio = width / height
     const screenRatio = windowWidth / windowHeight
-
-    // 9:16 视频在更长屏幕（如 9:19.5）上：
-    // contain → 上下黑边；cover → 铺满高度，仅裁左右
     const objectFit = videoRatio >= screenRatio ? 'cover' : 'contain'
 
     this.setData({ objectFit })
@@ -86,7 +114,9 @@ Page({
   },
 
   onVideoPlay() {
-    this.setData({ statusText: '' })
+    this._played = true
+    this.clearAutoplayTimer()
+    this.setData({ needTapPlay: false, statusText: '' })
   },
 
   onVideoWaiting() {
@@ -97,14 +127,33 @@ Page({
     this.goHome()
   },
 
-  onVideoError(event) {
+  async onVideoError(event) {
     console.error('splash video error', event.detail)
     if (this.data.useFallback) return
 
+    if (this._retryCount < 1) {
+      this._retryCount += 1
+      await invalidateSplashVideoCache()
+      this.setData({
+        videoSrc: '',
+        preparing: true,
+        needTapPlay: false,
+        statusText: '重新加载动画...'
+      })
+      this.initVideo()
+      return
+    }
+
+    this.enterFallback('动画播放失败，正在进入...')
+  },
+
+  enterFallback(statusText) {
     this.setData({
       useFallback: true,
+      preparing: false,
+      needTapPlay: false,
       videoSrc: '',
-      statusText: '动画播放失败，正在进入...'
+      statusText
     })
     this._fallbackTimer = setTimeout(() => this.goHome(), FALLBACK_DURATION)
   },

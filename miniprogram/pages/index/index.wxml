@@ -1,4 +1,6 @@
-<view class="page-bg tab-page">
+<splash-overlay wx:if="{{showSplash}}" bind:complete="onSplashComplete" />
+
+<view class="page-bg tab-page {{showSplash ? 'page-bg--hidden' : ''}}">
   <view class="container container--home">
     <!-- Banner：手绘边框卡片，完整展示不裁切 -->
     <view class="hero-banner card card--tilt-left">

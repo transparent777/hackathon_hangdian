@@ -23,6 +23,9 @@
     <cover-view class="skip-cover" bindtap="onTapSkip">
       <cover-view class="skip-hint">点击跳过</cover-view>
     </cover-view>
+    <cover-view class="tap-play-cover" wx:if="{{needTapPlay}}" bindtap="onTapPlay">
+      <cover-view class="tap-play-hint">{{statusText}}</cover-view>
+    </cover-view>
   </video>
   </view>
 

@@ -7,7 +7,8 @@ const TAB_LIST = [
 Component({
   data: {
     selected: 0,
-    list: TAB_LIST
+    list: TAB_LIST,
+    hidden: false
   },
 
   lifetimes: {

@@ -1,4 +1,4 @@
-<view class="tab-bar">
+<view class="tab-bar" wx:if="{{!hidden}}">
   <view class="tab-bar__brand">赛博陪伴相机</view>
   <view class="tab-bar__nav">
     <view
