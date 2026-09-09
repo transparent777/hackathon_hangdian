@@ -1,5 +1,5 @@
 // 换视频时递增版本号，避免真机仍播旧缓存
-const SPLASH_VIDEO_VERSION = '2.2'
+const SPLASH_VIDEO_VERSION = '2.3'
 const DEST_PATH = `${wx.env.USER_DATA_PATH}/splash-intro-${SPLASH_VIDEO_VERSION}.mp4`
 
 const PACKAGE_SOURCES = ['/assets/splash/intro.mp4']
