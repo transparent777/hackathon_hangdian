@@ -1,27 +1,33 @@
 <view class="page-bg tab-page">
-  <view class="container">
-    <!-- 顶部 Banner 占位：替换为 images/placeholders/home-banner.jpg -->
-    <view class="hero-banner card card--tilt-left {{bannerSrc ? '' : 'hero-banner--fallback'}}">
-      <image
-        wx:if="{{bannerSrc}}"
-        class="hero-banner__img"
-        src="{{bannerSrc}}"
-        mode="widthFix"
-        binderror="onBannerError"
-      />
-    </view>
-
-    <!-- 主 CTA：进入溶图 -->
-    <view class="blend-cta card" bind:tap="goCamera">
-      <view class="blend-cta__inner {{companion ? '' : 'blend-cta__inner--disabled'}}">
-        <van-icon name="photograph" size="22px" color="{{companion ? '#2D3436' : '#B2BEC3'}}" />
-        <text>进入溶图</text>
-        <van-icon name="arrow" size="16px" color="{{companion ? '#2D3436' : '#B2BEC3'}}" />
+  <view class="container container--home">
+    <!-- Banner：手绘边框卡片，完整展示不裁切 -->
+    <view class="hero-banner card card--tilt-left">
+      <view class="hero-banner__frame {{bannerSrc ? '' : 'hero-banner__frame--fallback'}}">
+        <image
+          wx:if="{{bannerSrc}}"
+          class="hero-banner__img"
+          src="{{bannerSrc}}"
+          mode="widthFix"
+          binderror="onBannerError"
+        />
       </view>
-      <view class="blend-cta__hint" wx:if="{{!companion}}">请先抽取今日陪伴兽</view>
     </view>
 
-    <!-- 左 Roll + 右陪伴兽 -->
+    <!-- 溶图入口：蓝色胶囊条（参考图中间那条） -->
+    <view
+      class="blend-pill {{companion ? '' : 'blend-pill--disabled'}}"
+      bind:tap="goCamera"
+    >
+      <view class="blend-pill__dot"></view>
+      <view class="blend-pill__main">
+        <van-icon name="photograph" size="20px" color="#2D3436" />
+        <text>进入溶图</text>
+      </view>
+      <view class="blend-pill__dot"></view>
+    </view>
+    <view class="blend-hint" wx:if="{{!companion}}">请先抽取今日陪伴兽</view>
+
+    <!-- 左 Roll + 右陪伴兽（圆形头像） -->
     <view class="dual-panel">
       <view class="panel panel--roll card card--tilt-left" bind:tap="onRoll">
         <view class="panel__label">抽取陪伴兽</view>
@@ -36,8 +42,8 @@
       <view class="panel panel--companion card card--tilt-right">
         <view class="panel__label">今日陪伴兽</view>
         <block wx:if="{{companion}}">
-          <view class="companion-cover">
-            <image class="companion-cover__img" src="{{companion.image}}" mode="aspectFit" />
+          <view class="companion-portrait" style="box-shadow: 0 8rpx 0 {{companion.accent}};">
+            <image class="companion-portrait__img" src="{{companion.image}}" mode="aspectFill" />
           </view>
           <van-tag color="{{companion.rarityColor}}" custom-class="rarity-tag">{{companion.rarity}}</van-tag>
           <view class="companion-name">{{companion.name}}</view>

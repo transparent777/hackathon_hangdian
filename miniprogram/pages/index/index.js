@@ -17,14 +17,16 @@ Page({
     bannerSrc: ''
   },
 
+  onLoad() {
+    this.setData({ bannerSrc: BANNER_FINAL })
+  },
+
   onShow() {
-    setTabBarIndex(this, 0)
-
-    if (!this._bannerChecked) {
-      this._bannerChecked = true
-      this.setData({ bannerSrc: BANNER_FINAL })
+    try {
+      setTabBarIndex(this, 0)
+    } catch (error) {
+      console.warn('tabBar sync failed', error)
     }
-
     const app = getApp()
     const raw = app.globalData.todayCompanion || getTodayCompanion()
     const companion = normalizeCompanion(raw)
