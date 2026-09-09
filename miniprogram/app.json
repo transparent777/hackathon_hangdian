@@ -2,6 +2,8 @@
   "pages": [
     "pages/splash/splash",
     "pages/index/index",
+    "pages/history/history",
+    "pages/me/me",
     "pages/camera/camera",
     "pages/result/result"
   ],
@@ -11,6 +13,27 @@
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FFF9F0",
     "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#B2BEC3",
+    "selectedColor": "#FFE66D",
+    "backgroundColor": "#3D5A80",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "text": "历史"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我的"
+      }
+    ]
   },
   "usingComponents": {
     "van-button": "@vant/weapp/button/index",

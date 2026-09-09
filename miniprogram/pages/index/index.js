@@ -1,31 +1,40 @@
 const { fetchRoll } = require('../../utils/api')
 const { getTodayCompanion, setTodayCompanion } = require('../../utils/daily')
-const { getHistory } = require('../../utils/history')
+const { setTabBarIndex } = require('../../utils/tabbar')
+
+const BANNER_FINAL = '/images/placeholders/home-banner.jpg'
 
 Page({
   data: {
     companion: null,
     rolling: false,
-    history: [],
-    useMock: true
+    bannerSrc: ''
   },
 
   onShow() {
+    setTabBarIndex(0)
+
+    if (!this._bannerChecked) {
+      this._bannerChecked = true
+      this.setData({ bannerSrc: BANNER_FINAL })
+    }
+
     const app = getApp()
     const companion = app.globalData.todayCompanion || getTodayCompanion()
-
     if (companion) {
       app.globalData.todayCompanion = companion
     }
 
-    this.setData({
-      companion,
-      history: getHistory(),
-      useMock: app.globalData.useMock
-    })
+    this.setData({ companion })
+  },
+
+  onBannerError() {
+    this.setData({ bannerSrc: '' })
   },
 
   async onRoll() {
+    if (this.data.rolling) return
+
     this.setData({ rolling: true })
     try {
       const companion = await fetchRoll()
@@ -35,7 +44,7 @@ Page({
       this.setData({ companion })
       wx.showToast({ title: `召唤了 ${companion.name}`, icon: 'none' })
     } catch (error) {
-      wx.showToast({ title: 'Roll 失败', icon: 'none' })
+      wx.showToast({ title: '抽取失败', icon: 'none' })
       console.error(error)
     } finally {
       this.setData({ rolling: false })
@@ -45,18 +54,11 @@ Page({
   goCamera() {
     const { companion } = this.data
     if (!companion) {
-      wx.showToast({ title: '请先 Roll 陪伴兽', icon: 'none' })
+      wx.showToast({ title: '请先抽取陪伴兽', icon: 'none' })
       return
     }
     wx.navigateTo({
       url: `/pages/camera/camera?characterId=${companion.characterId}&name=${companion.name}&image=${encodeURIComponent(companion.image)}`
-    })
-  },
-
-  openHistory(e) {
-    const { item } = e.currentTarget.dataset
-    wx.navigateTo({
-      url: `/pages/result/result?imageUrl=${encodeURIComponent(item.imageUrl)}&quote=${encodeURIComponent(item.quote)}&name=${encodeURIComponent(item.characterName)}&characterId=${item.characterId}&characterImage=${encodeURIComponent(item.characterImage || '')}`
     })
   }
 })

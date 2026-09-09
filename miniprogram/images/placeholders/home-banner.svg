@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="400" viewBox="0 0 750 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6C5CE7"/>
+      <stop offset="50%" stop-color="#74B9FF"/>
+      <stop offset="100%" stop-color="#FFE66D"/>
+    </linearGradient>
+  </defs>
+  <rect width="750" height="400" fill="url(#bg)"/>
+  <circle cx="120" cy="80" r="40" fill="#FF6B6B" stroke="#2D3436" stroke-width="6"/>
+  <circle cx="620" cy="300" r="56" fill="#FFE66D" stroke="#2D3436" stroke-width="6"/>
+  <text x="375" y="210" text-anchor="middle" font-size="42" font-weight="bold" fill="#2D3436" font-family="sans-serif">BANNER `M</text>
+  <text x="375" y="260" text-anchor="middle" font-size="22" fill="#2D3436" font-family="sans-serif">ÿb: home-banner.jpg</text>
+</svg>

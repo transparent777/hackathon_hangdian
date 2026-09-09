@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "历史",
+  "usingComponents": {
+    "van-icon": "@vant/weapp/icon/index"
+  }
+}

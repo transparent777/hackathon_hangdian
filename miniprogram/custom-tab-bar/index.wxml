@@ -1,0 +1,16 @@
+<view class="tab-bar">
+  <view class="tab-bar__brand">赛博陪伴相机</view>
+  <view class="tab-bar__nav">
+    <view
+      class="tab-bar__item {{selected === index ? 'tab-bar__item--active' : ''}}"
+      wx:for="{{list}}"
+      wx:key="pagePath"
+      data-index="{{index}}"
+      data-path="{{item.pagePath}}"
+      bindtap="onSwitch"
+    >
+      <van-icon name="{{item.icon}}" size="22px" color="{{selected === index ? '#FFE66D' : '#B2BEC3'}}" />
+      <text class="tab-bar__text">{{item.text}}</text>
+    </view>
+  </view>
+</view>

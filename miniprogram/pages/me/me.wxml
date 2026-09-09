@@ -1,0 +1,40 @@
+<view class="page-bg tab-page">
+  <view class="container">
+    <view class="profile-card card card--tilt-left">
+      <view class="profile-card__avatar">
+        <van-icon name="smile-o" size="40px" color="#6C5CE7" />
+      </view>
+      <view class="profile-card__name">赛博旅人</view>
+      <view class="profile-card__sub">陪伴相机 · 体验版</view>
+    </view>
+
+    <view class="section-label">玩法说明</view>
+    <view class="info-card card">
+      <view class="info-item" wx:for="{{guides}}" wx:key="title">
+        <view class="info-item__title">{{item.title}}</view>
+        <view class="info-item__desc">{{item.desc}}</view>
+      </view>
+    </view>
+
+    <view class="section-label">加分项（占位）</view>
+    <view class="bonus-grid">
+      <view class="bonus-card card" wx:for="{{bonusItems}}" wx:key="title">
+        <van-icon name="{{item.icon}}" size="24px" color="#6C5CE7" />
+        <view class="bonus-card__title">{{item.title}}</view>
+        <view class="bonus-card__status">{{item.status}}</view>
+      </view>
+    </view>
+
+    <view class="section-label">关于</view>
+    <view class="info-card card">
+      <view class="about-row">
+        <text>版本</text>
+        <text>0.1.0-mvp</text>
+      </view>
+      <view class="about-row" wx:if="{{useMock}}">
+        <text>接口模式</text>
+        <van-tag color="#FFE66D" text-color="#2D3436">Mock</van-tag>
+      </view>
+    </view>
+  </view>
+</view>

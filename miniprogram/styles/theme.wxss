@@ -79,3 +79,7 @@ page {
   background: var(--color-accent);
   border: 2rpx solid var(--color-ink);
 }
+
+.tab-page .container {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}

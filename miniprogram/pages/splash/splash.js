@@ -123,7 +123,7 @@ Page({
 
     this.setData({ leaving: true })
     setTimeout(() => {
-      wx.redirectTo({ url: '/pages/index/index' })
+      wx.switchTab({ url: '/pages/index/index' })
     }, 320)
   }
 })
