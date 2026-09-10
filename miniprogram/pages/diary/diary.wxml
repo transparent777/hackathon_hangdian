@@ -1,0 +1,83 @@
+<view class="page-bg diary-page">
+  <view class="container">
+    <view class="page-header card card--tilt-left">
+      <view class="page-header__title">陪伴日记</view>
+      <view class="page-header__sub">手账式记录 · 共 {{entries.length}} 页</view>
+    </view>
+
+    <block wx:if="{{!isEmpty}}">
+      <view
+        class="diary-entry card {{item.tiltClass}}"
+        wx:for="{{entries}}"
+        wx:key="id"
+      >
+        <image
+          class="diary-entry__paper"
+          src="/images/diary/draft-paper-bg.jpg"
+          mode="aspectFill"
+        />
+        <view class="diary-entry__body">
+          <view class="entry-date">
+            <view class="entry-date__dot"></view>
+            <text>{{item.dateLabel}}</text>
+          </view>
+
+          <view class="polaroid">
+            <view class="polaroid__photo-wrap">
+              <image class="polaroid__photo" src="{{item.imageUrl}}" mode="widthFix" />
+              <image
+                class="polaroid__sticker"
+                src="{{item.characterImage}}"
+                mode="aspectFit"
+              />
+            </view>
+            <view class="polaroid__caption">{{item.characterName}}</view>
+          </view>
+
+          <view class="entry-meta">
+            <image class="entry-meta__avatar" src="{{item.characterImage}}" mode="aspectFill" />
+            <view class="entry-meta__info">
+              <view class="entry-meta__name">{{item.characterName}}</view>
+              <van-tag
+                wx:if="{{item.rarity === '传说'}}"
+                color="#FF6B6B"
+                text-color="#FFFFFF"
+                size="medium"
+              >{{item.rarity}}</van-tag>
+              <van-tag
+                wx:elif="{{item.rarity === '稀有'}}"
+                color="#6C5CE7"
+                text-color="#FFFFFF"
+                size="medium"
+              >{{item.rarity}}</van-tag>
+              <van-tag wx:else color="#74B9FF" text-color="#FFFFFF" size="medium">{{item.rarity}}</van-tag>
+            </view>
+          </view>
+
+          <view class="entry-note {{item.noteClass}}" wx:if="{{item.hasNote}}">
+            <text class="entry-note__mark">✎</text>
+            <text class="entry-note__text">{{item.diaryNote}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="diary-end card card--tilt-right">
+        <text>—— 日记本暂时写到这里 ——</text>
+      </view>
+    </block>
+
+    <view class="empty-state card card--tilt-right" wx:else>
+      <image
+        class="diary-entry__paper"
+        src="/images/diary/draft-paper-bg.jpg"
+        mode="aspectFill"
+      />
+      <view class="diary-entry__body empty-state__body">
+        <van-icon name="notes-o" size="48px" color="#B2BEC3" />
+        <view class="empty-state__title">还没有日记</view>
+        <view class="empty-state__sub">去拍一张试试吧</view>
+        <view class="empty-btn" bind:tap="goHome">去首页溶图</view>
+      </view>
+    </view>
+  </view>
+</view>

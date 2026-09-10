@@ -6,6 +6,8 @@
       { "type": "suffix", "value": ".md" },
       { "type": "suffix", "value": ".map" },
       { "type": "glob", "value": "assets/splash/intro-source-*.mp4" },
+      { "type": "glob", "value": "assets/splash/*.tmp.mp4" },
+      { "type": "glob", "value": "images/diary/polaroid-frame-*.png" },
       { "type": "file", "value": "package-lock.json" }
     ],
     "include": []

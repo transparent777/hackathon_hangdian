@@ -37,7 +37,7 @@ function request({ url, method = 'GET', data = {} }) {
 }
 
 // B 联调：uploadFile 溶图
-function uploadBlend({ characterId, imagePath, openid }) {
+function uploadBlend({ characterId, imagePath, openid, rarity }) {
   const { apiBaseUrl } = getAppConfig()
 
   return new Promise((resolve, reject) => {
@@ -47,7 +47,8 @@ function uploadBlend({ characterId, imagePath, openid }) {
       name: 'image',
       formData: {
         characterId,
-        openid: openid || ''
+        openid: openid || '',
+        rarity: rarity || '普通'
       },
       success: (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -76,12 +77,12 @@ async function fetchRoll() {
   return data
 }
 
-async function fetchBlend({ characterId, imagePath, openid }) {
+async function fetchBlend({ characterId, imagePath, openid, rarity }) {
   const { useMock } = getAppConfig()
   if (useMock) {
-    return mockBlend({ characterId, imagePath })
+    return mockBlend({ characterId, imagePath, rarity })
   }
-  return uploadBlend({ characterId, imagePath, openid })
+  return uploadBlend({ characterId, imagePath, openid, rarity })
 }
 
 module.exports = {

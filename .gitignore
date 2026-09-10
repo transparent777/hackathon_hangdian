@@ -16,25 +16,57 @@ miniprogram/miniprogram_npm/
 # =========================
 .env
 .env.*
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
 
 # 本地密钥配置文件
 **/secrets.json
 **/secrets.yaml
 **/secrets.yml
+**/secrets.*
+**/*.secret
+**/*.secrets
 **/config.local.js
 **/config.local.json
 **/*.local.json
 **/*.local.js
 
-# AI / 云服务凭证（B、C 会用到）
+# npm / 包管理器鉴权（可能含 token）
+.npmrc
+!.npmrc.example
+
+# AI / 云服务凭证
 ai/.credentials/
 ai/credentials.*
 server/.credentials/
 server/credentials.*
 
+# 微信云开发 / 腾讯云本地配置
+**/cloudbaserc.local.json
+**/tcb_custom_login_key/
+**/tcb_custom_login_key.json
+
 # Postman / Apifox 环境文件（常含 API Key）
 *postman_environment*.json
 *.apifox.json
+
+# 常见密钥文件后缀
+*.pem
+*.p12
+*.pfx
+*.key
+*.keystore
+*.jks
+private.*.key
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+*.crt
+*.cer
+!**/*.example.key
 
 # =========================
 # 微信小程序私有配置（含 AppID）
@@ -56,6 +88,18 @@ pnpm-debug.log*
 .tmp/
 temp/
 cache/
+
+# =========================
+# Server 运行时
+# =========================
+server/node_modules/
+server/uploads/*
+!server/uploads/.gitkeep
+
+# 本地数据库（可能含 openid / 用户数据）
+*.sqlite
+*.sqlite3
+*.db
 
 # =========================
 # 构建产物
@@ -88,8 +132,9 @@ Desktop.ini
 .vscode/*
 !.vscode/extensions.json
 
-# Cursor
+# Cursor（本地会话；规则目录 .cursor/rules 若需共享可单独 un-ignore）
 .cursor/
+!.cursor/rules/
 
 # =========================
 # 测试 & 覆盖率
@@ -106,22 +151,24 @@ coverage/
 
 # 开场视频高清源（本地备份，不提交）
 miniprogram/assets/splash/intro-source-*.mp4
-miniprogram/node_modules/
+
+# 用户本地溶图 / 调试缓存（wxfile、临时导出）
+miniprogram/temp/
+miniprogram/cache/
 
 # =========================
 # 其他敏感或大文件（按需）
 # =========================
-# 用户上传的测试原图（若放本地调试）
+# 用户上传的测试原图（全局 uploads 目录）
 uploads/
 **/uploads/*
 !**/uploads/.gitkeep
+
+# 调试转储
+*.heapdump
+core.*
 
 # 打包压缩包
 *.zip
 *.tar.gz
 *.rar
-
-# 证书
-*.pem
-*.p12
-*.pfx

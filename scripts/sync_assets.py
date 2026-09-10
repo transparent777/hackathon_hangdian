@@ -83,6 +83,24 @@ def copy_and_compress_image(src: Path, dst: Path) -> bool:
     return True
 
 
+def copy_png_asset(src: Path, dst: Path) -> bool:
+    """复制 PNG 相框等需保留透明通道的素材"""
+    if not src.exists():
+        print(f"  skip (missing): {src.relative_to(ROOT)}")
+        return False
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
+    if dst.stat().st_size > IMAGE_MAX_BYTES:
+        from PIL import Image
+
+        im = Image.open(dst)
+        im.save(dst, "PNG", optimize=True)
+    if dst.stat().st_size > IMAGE_MAX_BYTES:
+        raise RuntimeError(f"{dst.relative_to(ROOT)} 仍超过 200KB ({dst.stat().st_size // 1024} KB)")
+    print(f"  ok: {dst.relative_to(ROOT)} ({dst.stat().st_size // 1024} KB)")
+    return True
+
+
 def copy_intro_video(src: Path, dst: Path) -> bool:
     if not src.exists():
         print(f"  skip (missing): {src.relative_to(ROOT)}")
@@ -121,6 +139,25 @@ def main():
                 SRC / "主页" / "陪伴兽" / cn / f"{r_cn}.jpg",
                 DST / "images" / "characters" / "covers" / cid / f"{r_en}.jpg",
             )
+
+    print("== diary (陪伴空间) ==")
+    diary_src = next(
+        (p for p in SRC.iterdir() if p.is_dir() and ((p / "相框1.png").exists() or (p / "相框1.jpg").exists())),
+        SRC / "陪伴空间",
+    )
+    frame1 = diary_src / "相框1.png" if (diary_src / "相框1.png").exists() else diary_src / "相框1.jpg"
+    frame2 = diary_src / "相框2.png" if (diary_src / "相框2.png").exists() else diary_src / "相框2.jpg"
+    dst1 = DST / "images" / "diary" / ("polaroid-frame-1.png" if frame1.suffix.lower() == ".png" else "polaroid-frame-1.jpg")
+    dst2 = DST / "images" / "diary" / ("polaroid-frame-2.png" if frame2.suffix.lower() == ".png" else "polaroid-frame-2.jpg")
+    if frame1.suffix.lower() == ".png":
+        copy_png_asset(frame1, dst1)
+    else:
+        copy_and_compress_image(frame1, dst1)
+    if frame2.suffix.lower() == ".png":
+        copy_png_asset(frame2, dst2)
+    else:
+        copy_and_compress_image(frame2, dst2)
+    copy_and_compress_image(diary_src / "草稿纸背景.jpg", DST / "images" / "diary" / "draft-paper-bg.jpg")
 
     print("== audit ==")
     bad = audit_miniprogram()

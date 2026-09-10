@@ -1,9 +1,9 @@
 {
-  "description": "本地私有配置模板 — 复制为 project.private.config.json 后填写",
+  "description": "可选：本地覆盖编译设置（该文件已被 .gitignore，AppID 一般写在 project.config.json）",
   "projectname": "cyber-companion",
-  "appid": "在这里填你的真实AppID",
+  "appid": "wxfcb5e5f3f5f23d43",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": false
+    "urlCheck": true
   }
 }
