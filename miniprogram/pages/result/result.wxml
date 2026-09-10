@@ -11,17 +11,24 @@
       </view>
     </view>
 
-    <van-button class="primary-btn" type="primary" color="#6C5CE7" block round bind:click="saveImage">
-      保存到相册
-    </van-button>
-
-    <button class="share-btn" open-type="share">
-      <van-icon name="share-o" size="18px" color="#2D3436" />
-      分享给朋友
-    </button>
-
-    <van-button class="primary-btn" type="default" custom-class="outline-btn" block round bind:click="retakePhoto">
-      再拍一张
-    </van-button>
+    <view class="action-group">
+      <action-pill
+        variant="primary"
+        text="保存到相册"
+        bind:tap="saveImage"
+      />
+      <action-pill
+        variant="accent"
+        text="分享给朋友"
+        icon="share-o"
+        open-type="share"
+      />
+      <action-pill
+        variant="secondary"
+        text="再拍一张"
+        icon="photograph"
+        bind:tap="retakePhoto"
+      />
+    </view>
   </view>
 </view>

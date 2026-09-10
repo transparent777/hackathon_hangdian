@@ -1,0 +1,26 @@
+<block wx:if="{{openType}}">
+  <button class="action-pill-native" open-type="{{openType}}" hover-class="action-pill-native--hover">
+    <view class="action-pill action-pill--{{variant}}">
+      <view class="action-pill__ornament"></view>
+      <view class="action-pill__body action-pill__body--{{variant}}">
+        <van-icon wx:if="{{icon}}" name="{{icon}}" size="20px" color="#2D3436" />
+        <text>{{text}}</text>
+      </view>
+      <view class="action-pill__ornament"></view>
+    </view>
+  </button>
+</block>
+
+<view
+  wx:else
+  class="action-pill action-pill--{{variant}} {{disabled ? 'action-pill--disabled' : ''}}"
+  bindtap="onTap"
+>
+  <view class="action-pill__ornament"></view>
+  <view class="action-pill__body action-pill__body--{{variant}}">
+    <van-loading wx:if="{{loading}}" size="20px" color="#2D3436" />
+    <van-icon wx:elif="{{icon}}" name="{{icon}}" size="20px" color="#2D3436" />
+    <text>{{loading ? loadingText : text}}</text>
+  </view>
+  <view class="action-pill__ornament"></view>
+</view>

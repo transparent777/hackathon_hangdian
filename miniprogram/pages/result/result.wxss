@@ -47,27 +47,3 @@
   line-height: 1.6;
 }
 
-.share-btn {
-  margin-top: 24rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12rpx;
-  height: 88rpx;
-  border-radius: 999rpx;
-  border: 3rpx solid #2d3436;
-  background: var(--color-accent);
-  font-size: 30rpx;
-  font-weight: 700;
-  color: #2d3436;
-}
-
-.share-btn::after {
-  border: none;
-}
-
-.outline-btn {
-  border: 3rpx solid #2d3436 !important;
-  color: #2d3436 !important;
-  font-weight: 700 !important;
-}

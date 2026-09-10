@@ -20,29 +20,22 @@
       <view class="placeholder">还没有选图</view>
     </view>
 
-    <van-button
-      class="primary-btn"
-      type="primary"
-      color="#6C5CE7"
-      block
-      round
-      bind:click="chooseImage"
-    >
-      拍照 / 从相册选择
-    </van-button>
-
-    <van-button
-      class="primary-btn"
-      type="default"
-      custom-class="outline-btn"
-      block
-      round
-      disabled="{{!imagePath || blending}}"
-      loading="{{blending}}"
-      bind:click="onBlend"
-    >
-      {{blending ? '溶图中...' : '开始溶图'}}
-    </van-button>
+    <view class="action-group">
+      <action-pill
+        variant="primary"
+        text="拍照 / 从相册选择"
+        icon="photograph"
+        bind:tap="chooseImage"
+      />
+      <action-pill
+        variant="secondary"
+        text="开始溶图"
+        loading-text="溶图中..."
+        disabled="{{!imagePath || blending}}"
+        loading="{{blending}}"
+        bind:tap="onBlend"
+      />
+    </view>
   </view>
 
   <van-overlay show="{{blending}}" z-index="100">

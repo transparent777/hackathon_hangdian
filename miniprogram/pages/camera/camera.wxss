@@ -48,12 +48,6 @@
   box-shadow: var(--shadow-soft);
 }
 
-.outline-btn {
-  border: 3rpx solid #2d3436 !important;
-  color: #2d3436 !important;
-  font-weight: 700 !important;
-}
-
 .overlay-panel {
   height: 100%;
   display: flex;

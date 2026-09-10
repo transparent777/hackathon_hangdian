@@ -72,6 +72,13 @@ page {
   margin-top: 24rpx;
 }
 
+.action-group {
+  margin-top: 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
 .doodle-dot {
   width: 16rpx;
   height: 16rpx;
