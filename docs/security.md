@@ -10,7 +10,7 @@
 - `node_modules/`、`miniprogram_npm/`
 
 **可以提交：**
-- `project.config.json`（AppID 必须为占位符 `wxYOUR_APPID_HERE`）
+- `project.config.json`（含 AppID，小程序 AppID 本身可公开）
 - `project.private.config.json.example`、`server/.env.example`（模板，无真实密钥）
 - `ai/diary-prompts.json`（仅 prompt 文案，不含 Key）
 
@@ -27,7 +27,7 @@ copy project.private.config.json.example project.private.config.json
 ```
 
 - `project.private.config.json` 已被 `.gitignore`
-- **禁止**把真实 AppID 写回 `project.config.json`
+- AppID 写在 `project.config.json` 即可；**AppSecret 绝不可进仓库**
 
 ### 后端
 

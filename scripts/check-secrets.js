@@ -34,7 +34,11 @@ const RULES = [
   { name: '硬编码 secret', pattern: /(?:app)?secret\s*[:=]\s*['"][^'"]{8,}['"]/i },
   { name: '硬编码 password', pattern: /password\s*[:=]\s*['"][^'"]{4,}['"]/i },
   { name: '微信 AppSecret', pattern: /appsecret\s*[:=]\s*['"][^'"]+['"]/i },
-  { name: '真实微信 AppID（wx 开头 18 位）', pattern: /\bwx[a-f0-9]{16}\b/i, allowIn: ['project.private.config.json'] }
+  {
+    name: '真实微信 AppID（wx 开头 18 位）',
+    pattern: /\bwx[a-f0-9]{16}\b/i,
+    allowIn: ['project.config.json', 'project.private.config.json', 'project.private.config.json.example']
+  }
 ]
 
 function shouldSkip(filePath) {
