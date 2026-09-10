@@ -1,3 +1,5 @@
+const { DIARY_ASSETS } = require('./diary-assets')
+
 const RARITY_KEY_MAP = {
   普通: 'normal',
   稀有: 'rare',
@@ -50,6 +52,7 @@ function enrichDiaryList(list) {
 }
 
 module.exports = {
+  DIARY_ASSETS,
   getRarityKey,
   getFontStyle,
   formatDiaryDate,
