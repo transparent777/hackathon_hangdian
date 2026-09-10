@@ -14,7 +14,7 @@
 <view
   wx:else
   class="action-pill action-pill--{{variant}} {{disabled ? 'action-pill--disabled' : ''}}"
-  bindtap="onTap"
+  catchtap="onTap"
 >
   <view class="action-pill__ornament"></view>
   <view class="action-pill__body action-pill__body--{{variant}}">

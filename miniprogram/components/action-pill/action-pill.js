@@ -33,6 +33,13 @@ Component({
   methods: {
     onTap() {
       if (this.data.disabled || this.data.loading) return
+      if (this._tapLocked) return
+
+      this._tapLocked = true
+      setTimeout(() => {
+        this._tapLocked = false
+      }, 500)
+
       this.triggerEvent('tap')
     }
   }

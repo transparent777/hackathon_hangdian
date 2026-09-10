@@ -16,12 +16,17 @@ Page({
     const character = getCharacterById(options.characterId || 'naiwa', rarity)
     this.setData({
       characterId: character.characterId,
-      characterName: options.name || character.name,
-      characterImage: decodeURIComponent(options.image || '') || character.image
+      characterName: decodeURIComponent(options.name || '') || character.name,
+      characterImage: decodeURIComponent(options.image || '') || character.image,
+      imagePath: '',
+      blending: false
     })
   },
 
   chooseImage() {
+    if (this._pickingImage) return
+    this._pickingImage = true
+
     wx.chooseMedia({
       count: 1,
       mediaType: ['image'],
@@ -33,6 +38,9 @@ Page({
       fail: (err) => {
         if (err.errMsg && err.errMsg.includes('cancel')) return
         wx.showToast({ title: '选图失败', icon: 'none' })
+      },
+      complete: () => {
+        this._pickingImage = false
       }
     })
   },

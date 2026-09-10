@@ -15,7 +15,7 @@
       <action-pill
         variant="primary"
         text="保存到相册"
-        bind:tap="saveImage"
+        catch:tap="saveImage"
       />
       <action-pill
         variant="accent"
@@ -27,7 +27,7 @@
         variant="secondary"
         text="再拍一张"
         icon="photograph"
-        bind:tap="retakePhoto"
+        catch:tap="retakePhoto"
       />
     </view>
   </view>

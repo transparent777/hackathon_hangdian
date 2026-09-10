@@ -1,4 +1,5 @@
 const { getCharacterById } = require('../../utils/characters')
+const { buildCameraPageUrl } = require('../../utils/camera-route')
 const { saveImageToAlbum, handleSaveImageError } = require('../../utils/save-image')
 
 Page({
@@ -46,13 +47,23 @@ Page({
   },
 
   retakePhoto() {
-    const pages = getCurrentPages()
-    const cameraPage = pages[pages.length - 2]
+    if (this._retakeLock) return
+    this._retakeLock = true
 
-    if (cameraPage && cameraPage.route === 'pages/camera/camera') {
-      cameraPage.setData({ imagePath: '', blending: false })
-    }
+    const { characterId, characterName, characterImage } = this.data
+    const url = buildCameraPageUrl({
+      characterId,
+      name: characterName,
+      image: characterImage
+    })
 
-    wx.navigateBack({ delta: 1 })
+    wx.redirectTo({
+      url,
+      fail: (error) => {
+        console.error('redirect to camera failed', error)
+        wx.showToast({ title: '无法打开拍照页', icon: 'none' })
+        this._retakeLock = false
+      }
+    })
   }
 })
