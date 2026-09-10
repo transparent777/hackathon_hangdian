@@ -20,7 +20,7 @@
       分享给朋友
     </button>
 
-    <van-button class="primary-btn" type="default" custom-class="outline-btn" block round bind:click="goHome">
+    <van-button class="primary-btn" type="default" custom-class="outline-btn" block round bind:click="retakePhoto">
       再拍一张
     </van-button>
   </view>

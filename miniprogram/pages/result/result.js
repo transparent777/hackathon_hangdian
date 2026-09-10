@@ -48,7 +48,14 @@ Page({
     })
   },
 
-  goHome() {
-    wx.navigateBack({ delta: 2 })
+  retakePhoto() {
+    const pages = getCurrentPages()
+    const cameraPage = pages[pages.length - 2]
+
+    if (cameraPage && cameraPage.route === 'pages/camera/camera') {
+      cameraPage.setData({ imagePath: '', blending: false })
+    }
+
+    wx.navigateBack({ delta: 1 })
   }
 })
