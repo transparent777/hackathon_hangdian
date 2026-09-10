@@ -1,4 +1,4 @@
-const RESUME_THRESHOLD_MS = 2000
+// 方案 A：每次冷启动（onLaunch）只播一次；回首页 / 切 Tab / 切后台回来均不重播
 
 function shouldShowSplash() {
   const app = getApp()
@@ -9,16 +9,7 @@ function dismissSplash() {
   getApp().globalData._splashDismissed = true
 }
 
-function resetSplashOnAppShow(hiddenMs) {
-  const app = getApp()
-  if (hiddenMs >= RESUME_THRESHOLD_MS) {
-    app.globalData._splashDismissed = false
-  }
-}
-
 module.exports = {
   shouldShowSplash,
-  dismissSplash,
-  resetSplashOnAppShow,
-  RESUME_THRESHOLD_MS
+  dismissSplash
 }

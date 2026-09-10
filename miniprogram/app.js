@@ -1,5 +1,4 @@
 const { prepareSplashVideo } = require('./utils/splash-video')
-const { resetSplashOnAppShow, RESUME_THRESHOLD_MS } = require('./utils/splash-session')
 
 App({
   globalData: {
@@ -12,6 +11,7 @@ App({
   },
 
   onLaunch() {
+    // 仅冷启动重置：本次打开小程序只播一次开场动画
     this.globalData._splashDismissed = false
 
     prepareSplashVideo().catch((error) => {
@@ -23,15 +23,5 @@ App({
     if (companion) {
       this.globalData.todayCompanion = companion
     }
-  },
-
-  onShow() {
-    const lastHideAt = this._hiddenAt || 0
-    const hiddenMs = lastHideAt > 0 ? Date.now() - lastHideAt : RESUME_THRESHOLD_MS
-    resetSplashOnAppShow(hiddenMs)
-  },
-
-  onHide() {
-    this._hiddenAt = Date.now()
   }
 })

@@ -16,7 +16,7 @@ Page({
     companion: null,
     rolling: false,
     bannerSrc: '',
-    showSplash: true
+    showSplash: false
   },
 
   onLoad() {
@@ -36,10 +36,6 @@ Page({
   },
 
   onShow() {
-    if (shouldShowSplash() && !this.data.showSplash) {
-      this.setData({ showSplash: true })
-    }
-
     this.syncTabBarVisibility()
 
     try {
