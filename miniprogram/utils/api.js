@@ -36,7 +36,37 @@ function request({ url, method = 'GET', data = {} }) {
   })
 }
 
-// 今日 roll：9/08 先用 mock，9/09 接 B 的 /roll
+// B 联调：uploadFile 溶图
+function uploadBlend({ characterId, imagePath, openid }) {
+  const { apiBaseUrl } = getAppConfig()
+
+  return new Promise((resolve, reject) => {
+    wx.uploadFile({
+      url: `${apiBaseUrl}/blend`,
+      filePath: imagePath,
+      name: 'image',
+      formData: {
+        characterId,
+        openid: openid || ''
+      },
+      success: (res) => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          try {
+            const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+            resolve(data)
+            return
+          } catch (error) {
+            reject(new Error('溶图返回解析失败'))
+            return
+          }
+        }
+        reject(new Error('溶图失败'))
+      },
+      fail: reject
+    })
+  })
+}
+
 async function fetchRoll() {
   const { useMock } = getAppConfig()
   if (useMock) {
@@ -46,23 +76,17 @@ async function fetchRoll() {
   return data
 }
 
-// 溶图：9/08 mock，9/09 接 B 的 /blend
-async function fetchBlend({ characterId, imagePath }) {
+async function fetchBlend({ characterId, imagePath, openid }) {
   const { useMock } = getAppConfig()
   if (useMock) {
     return mockBlend({ characterId, imagePath })
   }
-
-  // 真实接口：图片一般先 uploadFile 到后端，这里留给 9/09 和 B 对齐
-  const data = await request({
-    url: '/blend',
-    method: 'POST',
-    data: { characterId, imagePath }
-  })
-  return data
+  return uploadBlend({ characterId, imagePath, openid })
 }
 
 module.exports = {
+  request,
   fetchRoll,
-  fetchBlend
+  fetchBlend,
+  uploadBlend
 }

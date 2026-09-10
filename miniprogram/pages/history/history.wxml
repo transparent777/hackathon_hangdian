@@ -1,0 +1,30 @@
+<view class="page-bg tab-page">
+  <view class="container">
+    <view class="page-header card card--tilt-left">
+      <view class="page-header__title">陪伴瞬间</view>
+      <view class="page-header__sub">最近 {{history.length}} / {{maxItems}} 条溶图记录</view>
+    </view>
+
+    <view class="history-grid" wx:if="{{history.length}}">
+      <view
+        class="history-card card"
+        wx:for="{{history}}"
+        wx:key="id"
+        data-item="{{item}}"
+        bind:tap="openItem"
+      >
+        <image class="history-card__img" src="{{item.imageUrl}}" mode="aspectFill" />
+        <view class="history-card__meta">
+          <view class="history-card__name">{{item.characterName}}</view>
+          <view class="history-card__quote">{{item.quote}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state card card--tilt-right" wx:else>
+      <van-icon name="photo-o" size="48px" color="#B2BEC3" />
+      <view class="empty-state__title">还没有溶图记录</view>
+      <view class="empty-state__sub">去首页抽取陪伴兽，拍一张试试吧</view>
+    </view>
+  </view>
+</view>

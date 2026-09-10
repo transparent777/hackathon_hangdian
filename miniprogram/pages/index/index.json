@@ -1,6 +1,9 @@
 {
-  "navigationBarTitleText": "今日陪伴兽",
+  "navigationBarTitleText": "首页",
   "usingComponents": {
-    "van-button": "@vant/weapp/button/index"
+    "splash-overlay": "/components/splash-overlay/splash-overlay",
+    "van-icon": "@vant/weapp/icon/index",
+    "van-loading": "@vant/weapp/loading/index",
+    "van-tag": "@vant/weapp/tag/index"
   }
 }

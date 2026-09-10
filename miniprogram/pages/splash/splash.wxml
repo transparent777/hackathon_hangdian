@@ -1,0 +1,41 @@
+<view class="splash {{leaving ? 'splash--leave' : ''}}">
+  <view class="splash-video-wrap" wx:if="{{videoSrc && !useFallback}}">
+  <video
+    id="splash-video"
+    class="splash-video"
+    src="{{videoSrc}}"
+    autoplay="{{true}}"
+    muted="{{true}}"
+    loop="{{false}}"
+    object-fit="{{objectFit}}"
+    controls="{{false}}"
+    show-center-play-btn="{{false}}"
+    show-play-btn="{{false}}"
+    show-fullscreen-btn="{{false}}"
+    show-mute-btn="{{false}}"
+    enable-progress-gesture="{{false}}"
+    bindplay="onVideoPlay"
+    bindwaiting="onVideoWaiting"
+    bindloadedmetadata="onVideoLoadedMeta"
+    bindended="onVideoEnd"
+    binderror="onVideoError"
+  >
+    <cover-view class="skip-cover" bindtap="onTapSkip">
+      <cover-view class="skip-hint">点击跳过</cover-view>
+    </cover-view>
+    <cover-view class="tap-play-cover" wx:if="{{needTapPlay}}" bindtap="onTapPlay">
+      <cover-view class="tap-play-hint">{{statusText}}</cover-view>
+    </cover-view>
+  </video>
+  </view>
+
+  <view class="splash-fallback" wx:if="{{useFallback}}">
+    <view class="brand-title">赛博陪伴相机</view>
+    <view class="brand-tag">CYBER PET</view>
+    <view class="loading-text">{{statusText}}</view>
+  </view>
+
+  <view class="splash-loading" wx:if="{{preparing && !useFallback}}">
+    <view class="loading-text">{{statusText}}</view>
+  </view>
+</view>

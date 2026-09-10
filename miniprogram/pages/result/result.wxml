@@ -1,18 +1,40 @@
-<view class="container">
-  <view class="card">
-    <view class="title">{{characterName}} 来陪你了</view>
-    <view class="subtitle">「{{quote}}」</view>
+<view class="page-bg">
+  <view class="container">
+    <view class="polaroid card card--tilt-left">
+      <view class="photo-frame">
+        <image class="bg-photo" src="{{imageUrl}}" mode="aspectFill" />
+        <image class="character-sticker" src="{{characterImage}}" mode="aspectFit" />
+      </view>
+      <view class="polaroid-caption">
+        <view class="caption-name">{{characterName}}</view>
+        <view class="caption-quote">「{{quote}}」</view>
+      </view>
+    </view>
+
+    <view class="action-group">
+      <action-pill
+        variant="primary"
+        text="保存到相册"
+        catch:tap="saveImage"
+      />
+      <action-pill
+        variant="accent"
+        text="分享给朋友"
+        icon="share-o"
+        open-type="share"
+      />
+      <action-pill
+        variant="secondary"
+        text="再拍一张"
+        icon="photograph"
+        catch:tap="retakePhoto"
+      />
+      <action-pill
+        variant="secondary"
+        text="返回首页"
+        icon="wap-home-o"
+        catch:tap="goHome"
+      />
+    </view>
   </view>
-
-  <view class="card image-card">
-    <image class="result-image" src="{{imageUrl}}" mode="widthFix" />
-  </view>
-
-  <van-button class="primary-btn" type="primary" color="#6C5CE7" block round bind:click="saveImage">
-    保存到相册
-  </van-button>
-
-  <van-button class="primary-btn" type="default" block round bind:click="goHome">
-    再拍一张
-  </van-button>
 </view>

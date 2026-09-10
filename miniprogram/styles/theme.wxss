@@ -1,0 +1,92 @@
+/* JuJuly 风 · 赛博陪伴令牌 */
+page {
+  --bg-cream: #fff9f0;
+  --bg-warm: #fff3e0;
+  --color-ink: #2d3436;
+  --color-muted: #636e72;
+  --color-primary: #6c5ce7;
+  --color-accent: #ffe66d;
+  --color-coral: #ff6b6b;
+  --color-sky: #74b9ff;
+  --radius-card: 28rpx;
+  --radius-pill: 999rpx;
+  --border-sketch: 4rpx solid #2d3436;
+  --shadow-soft: 0 12rpx 0 rgba(45, 52, 54, 0.08);
+  --shadow-lift: 0 16rpx 40rpx rgba(108, 92, 231, 0.12);
+
+  background: var(--bg-cream);
+  color: var(--color-ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', sans-serif;
+}
+
+.page-bg {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-warm) 100%);
+}
+
+.container {
+  min-height: 100vh;
+  padding: 32rpx 32rpx 48rpx;
+  box-sizing: border-box;
+}
+
+.card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  padding: 32rpx;
+  border: var(--border-sketch);
+  box-shadow: var(--shadow-soft);
+}
+
+.card--tilt-left {
+  transform: rotate(-1deg);
+}
+
+.card--tilt-right {
+  transform: rotate(1deg);
+}
+
+.brand-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  letter-spacing: 2rpx;
+  color: var(--color-ink);
+}
+
+.brand-subtitle {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.section-label {
+  margin: 40rpx 0 16rpx;
+  font-size: 24rpx;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 4rpx;
+}
+
+.primary-btn {
+  margin-top: 24rpx;
+}
+
+.action-group {
+  margin-top: 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.doodle-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 2rpx solid var(--color-ink);
+}
+
+.tab-page .container {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}

@@ -1,0 +1,102 @@
+.action-pill-native {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  line-height: normal;
+  width: 100%;
+}
+
+.action-pill-native::after {
+  border: none;
+}
+
+.action-pill-native--hover {
+  opacity: 0.92;
+}
+
+.action-pill {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 20rpx;
+  border: 4rpx solid #2d3436;
+  border-radius: 999rpx;
+  box-shadow: 0 8rpx 0 rgba(45, 52, 54, 0.12);
+}
+
+/* 主：蓝外框 + 黄芯 + 圆点 */
+.action-pill--primary {
+  background: #3d5a80;
+}
+
+.action-pill--primary .action-pill__ornament {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  background: #ffe66d;
+  border: 2rpx solid #2d3436;
+  flex-shrink: 0;
+}
+
+.action-pill__body--primary {
+  background: #ffe66d;
+}
+
+/* 分享：黄外框 + 白芯 + 方点 */
+.action-pill--accent {
+  background: #ffe66d;
+}
+
+.action-pill--accent .action-pill__ornament {
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 4rpx;
+  background: #ffffff;
+  border: 2rpx solid #2d3436;
+  flex-shrink: 0;
+}
+
+.action-pill__body--accent {
+  background: #ffffff;
+}
+
+/* 次：白外框 + 浅蓝芯 + 三角点 */
+.action-pill--secondary {
+  background: #ffffff;
+}
+
+.action-pill--secondary .action-pill__ornament {
+  width: 18rpx;
+  height: 16rpx;
+  background: #74b9ff;
+  border: 2rpx solid #2d3436;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.action-pill__body--secondary {
+  background: #dceeff;
+}
+
+.action-pill__body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin: 0 16rpx;
+  padding: 14rpx 24rpx;
+  border: 3rpx solid #2d3436;
+  border-radius: 999rpx;
+  font-size: 30rpx;
+  font-weight: 800;
+  color: #2d3436;
+}
+
+.action-pill--disabled {
+  opacity: 0.5;
+}

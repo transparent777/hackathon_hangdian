@@ -1,42 +1,60 @@
-<view class="container">
-  <view class="card hero">
-    <view class="title">赛博陪伴相机</view>
-    <view class="subtitle">每天随机 roll 一只陪伴兽，溶进你的真实生活</view>
+<splash-overlay wx:if="{{showSplash}}" bind:complete="onSplashComplete" />
+
+<view class="page-bg tab-page {{showSplash ? 'page-bg--hidden' : ''}}">
+  <view class="container container--home">
+    <!-- Banner：手绘边框卡片，完整展示不裁切 -->
+    <view class="hero-banner card card--tilt-left">
+      <view class="hero-banner__frame {{bannerSrc ? '' : 'hero-banner__frame--fallback'}}">
+        <image
+          wx:if="{{bannerSrc}}"
+          class="hero-banner__img"
+          src="{{bannerSrc}}"
+          mode="widthFix"
+          binderror="onBannerError"
+        />
+      </view>
+    </view>
+
+    <!-- 溶图入口：蓝色胶囊条（参考图中间那条） -->
+    <view
+      class="blend-pill {{companion ? '' : 'blend-pill--disabled'}}"
+      bind:tap="goCamera"
+    >
+      <view class="blend-pill__dot"></view>
+      <view class="blend-pill__main">
+        <van-icon name="photograph" size="20px" color="#2D3436" />
+        <text>进入溶图</text>
+      </view>
+      <view class="blend-pill__dot"></view>
+    </view>
+    <view class="blend-hint" wx:if="{{!companion}}">请先抽取今日陪伴兽</view>
+
+    <!-- 左 Roll + 右陪伴兽（圆形头像） -->
+    <view class="dual-panel">
+      <view class="panel panel--roll card card--tilt-left" bind:tap="onRoll">
+        <view class="panel__label">抽取陪伴兽</view>
+        <view class="panel__icon-wrap">
+          <van-loading wx:if="{{rolling}}" size="28px" color="#6C5CE7" />
+          <van-icon wx:else name="gift-o" size="36px" color="#6C5CE7" />
+        </view>
+        <view class="panel__action">{{companion ? '重新抽取' : '点击抽取'}}</view>
+        <view class="panel__sub">每日随机一只</view>
+      </view>
+
+      <view class="panel panel--companion card card--tilt-right">
+        <view class="panel__label">今日陪伴兽</view>
+        <block wx:if="{{companion}}">
+          <view class="companion-portrait" style="box-shadow: 0 8rpx 0 {{companion.accent}};">
+            <image class="companion-portrait__img" src="{{companion.image}}" mode="aspectFill" />
+          </view>
+          <van-tag color="{{companion.rarityColor}}" custom-class="rarity-tag">{{companion.rarity}}</van-tag>
+          <view class="companion-name">{{companion.name}}</view>
+        </block>
+        <block wx:else>
+          <view class="companion-empty">?</view>
+          <view class="companion-name companion-name--muted">等待抽取</view>
+        </block>
+      </view>
+    </view>
   </view>
-
-  <view class="card companion" wx:if="{{companion}}">
-    <view class="roll-tag">今日陪伴兽 · {{companion.rarity}}</view>
-    <view class="emoji">{{companion.emoji}}</view>
-    <view class="name">{{companion.name}}</view>
-    <view class="quote">「{{companion.quote}}」</view>
-  </view>
-
-  <view class="card companion empty" wx:else>
-    <view class="emoji">🎲</view>
-    <view class="name">还没有 roll 哦</view>
-    <view class="quote">点下面按钮，召唤今天的赛博伙伴</view>
-  </view>
-
-  <van-button
-    class="primary-btn"
-    type="primary"
-    color="#6C5CE7"
-    block
-    round
-    loading="{{rolling}}"
-    bind:click="onRoll"
-  >
-    {{companion ? '重新 Roll' : 'Roll 今日陪伴兽'}}
-  </van-button>
-
-  <van-button
-    class="primary-btn"
-    type="default"
-    block
-    round
-    disabled="{{!companion}}"
-    bind:click="goCamera"
-  >
-    拍照溶图
-  </van-button>
 </view>

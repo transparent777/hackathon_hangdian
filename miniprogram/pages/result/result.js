@@ -1,37 +1,76 @@
+const { getCharacterById } = require('../../utils/characters')
+const { buildCameraPageUrl } = require('../../utils/camera-route')
+const { saveImageToAlbum, handleSaveImageError } = require('../../utils/save-image')
+
 Page({
   data: {
     imageUrl: '',
     quote: '',
-    characterName: ''
+    characterName: '',
+    characterId: '',
+    characterImage: '',
+    sourceImagePath: ''
   },
 
   onLoad(options) {
+    const character = getCharacterById(options.characterId || 'naiwa')
     this.setData({
       imageUrl: decodeURIComponent(options.imageUrl || ''),
       quote: decodeURIComponent(options.quote || ''),
-      characterName: decodeURIComponent(options.name || '陪伴兽')
+      characterName: decodeURIComponent(options.name || character.name),
+      characterId: options.characterId || character.characterId,
+      characterImage: decodeURIComponent(options.characterImage || '') || character.image,
+      sourceImagePath: decodeURIComponent(options.sourceImagePath || '')
     })
   },
 
-  saveImage() {
+  onShareAppMessage() {
+    const { characterName, quote } = this.data
+    return {
+      title: `${characterName} 来陪你了：${quote}`,
+      path: '/pages/index/index'
+    }
+  },
+
+  async saveImage() {
     const { imageUrl } = this.data
-    wx.saveImageToPhotosAlbum({
-      filePath: imageUrl,
-      success: () => wx.showToast({ title: '已保存', icon: 'success' }),
-      fail: () => {
-        wx.showModal({
-          title: '需要相册权限',
-          content: '请在设置中允许保存到相册',
-          confirmText: '去设置',
-          success: (res) => {
-            if (res.confirm) wx.openSetting()
-          }
-        })
+    if (!imageUrl) return
+
+    try {
+      const stablePath = await saveImageToAlbum(imageUrl)
+      if (stablePath !== imageUrl) {
+        this.setData({ imageUrl: stablePath })
+      }
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    } catch (error) {
+      console.error('save image failed', error)
+      handleSaveImageError(error)
+    }
+  },
+
+  retakePhoto() {
+    if (this._retakeLock) return
+    this._retakeLock = true
+
+    const { characterId, characterName, characterImage, sourceImagePath } = this.data
+    const url = buildCameraPageUrl({
+      characterId,
+      name: characterName,
+      image: characterImage,
+      imagePath: sourceImagePath
+    })
+
+    wx.redirectTo({
+      url,
+      fail: (error) => {
+        console.error('redirect to camera failed', error)
+        wx.showToast({ title: '无法打开拍照页', icon: 'none' })
+        this._retakeLock = false
       }
     })
   },
 
   goHome() {
-    wx.navigateBack({ delta: 2 })
+    wx.switchTab({ url: '/pages/index/index' })
   }
 })
