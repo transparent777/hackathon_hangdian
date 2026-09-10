@@ -1,0 +1,62 @@
+{
+  "info": {
+    "_postman_id": "a56a12f7-f4fd-4d08-bd8a-843f848d881c",
+    "name": "赛博陪伴相机 API",
+    "description": "B 提供给 D 的接口冒烟测试集合。先启动 server，再依次运行 Health、Roll、Blend、History。",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api", "type": "string" },
+    { "key": "openid", "value": "postman-demo-user", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health",
+        "description": "确认后端已经启动；provider=mock 表示真实 AI 尚未接入。"
+      }
+    },
+    {
+      "name": "2. Roll",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"openid\": \"{{openid}}\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/roll"
+      }
+    },
+    {
+      "name": "3. Blend",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "openid", "value": "{{openid}}", "type": "text" },
+            { "key": "characterId", "value": "doro", "type": "text" },
+            { "key": "rarity", "value": "稀有", "type": "text" },
+            { "key": "image", "type": "file", "src": [], "description": "D 在这里选择一张本地测试图片" }
+          ]
+        },
+        "url": "{{baseUrl}}/blend",
+        "description": "需要在 image 行选择本地图片。当前 Mock provider 会把原图作为结果图返回。"
+      }
+    },
+    {
+      "name": "4. History",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/history?openid={{openid}}&limit=10"
+      }
+    }
+  ]
+}
