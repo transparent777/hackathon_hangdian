@@ -79,6 +79,15 @@
   color: var(--color-muted);
 }
 
+.bonus-card--active:active {
+  transform: scale(0.98);
+}
+
+.bonus-card__status--ready {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
 .about-row {
   display: flex;
   align-items: center;

@@ -5,7 +5,8 @@
     "pages/history/history",
     "pages/me/me",
     "pages/camera/camera",
-    "pages/result/result"
+    "pages/result/result",
+    "pages/diary/diary"
   ],
   "window": {
     "navigationBarTitleText": "赛博陪伴相机",

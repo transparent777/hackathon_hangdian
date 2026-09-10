@@ -16,12 +16,18 @@
       </view>
     </view>
 
-    <view class="section-label">加分项（占位）</view>
+    <view class="section-label">加分项</view>
     <view class="bonus-grid">
-      <view class="bonus-card card" wx:for="{{bonusItems}}" wx:key="title">
+      <view
+        class="bonus-card card {{item.page ? 'bonus-card--active' : ''}}"
+        wx:for="{{bonusItems}}"
+        wx:key="title"
+        data-page="{{item.page}}"
+        bind:tap="onBonusTap"
+      >
         <van-icon name="{{item.icon}}" size="24px" color="#6C5CE7" />
         <view class="bonus-card__title">{{item.title}}</view>
-        <view class="bonus-card__status">{{item.status}}</view>
+        <view class="bonus-card__status {{item.page ? 'bonus-card__status--ready' : ''}}">{{item.status}}</view>
       </view>
     </view>
 

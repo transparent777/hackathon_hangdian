@@ -20,9 +20,12 @@ async function addHistory(record) {
     characterId: record.characterId,
     characterName: record.characterName,
     characterImage: record.characterImage,
+    rarity: record.rarity || '普通',
     imageUrl: savedImagePath,
     sourceImagePath: record.sourceImagePath || '',
     quote: record.quote,
+    diaryNote: record.diaryNote || '',
+    fontStyle: record.fontStyle || record.characterId || 'naiwa',
     createdAt: Date.now()
   }
 

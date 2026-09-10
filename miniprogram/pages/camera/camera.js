@@ -8,6 +8,7 @@ Page({
     characterId: '',
     characterName: '',
     characterImage: '',
+    rarity: '普通',
     imagePath: '',
     blending: false
   },
@@ -21,6 +22,7 @@ Page({
       characterId: character.characterId,
       characterName: decodeURIComponent(options.name || '') || character.name,
       characterImage: decodeURIComponent(options.image || '') || character.image,
+      rarity: character.rarity || rarity,
       imagePath,
       blending: false
     })
@@ -68,7 +70,7 @@ Page({
   },
 
   async onBlend() {
-    const { characterId, imagePath, characterName, characterImage } = this.data
+    const { characterId, imagePath, characterName, characterImage, rarity } = this.data
     if (!imagePath) {
       wx.showToast({ title: '请先选一张图', icon: 'none' })
       return
@@ -81,14 +83,17 @@ Page({
         this.setData({ imagePath: stableSourcePath })
       }
 
-      const result = await fetchBlend({ characterId, imagePath: stableSourcePath })
+      const result = await fetchBlend({ characterId, imagePath: stableSourcePath, rarity })
       const historyItem = await addHistory({
         characterId,
         characterName,
         characterImage,
+        rarity,
         imageUrl: result.resultUrl,
         sourceImagePath: stableSourcePath,
-        quote: result.companionText
+        quote: result.companionText,
+        diaryNote: result.diaryNote || '',
+        fontStyle: result.fontStyle || characterId
       })
 
       const query = [
