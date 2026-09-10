@@ -1,0 +1,20 @@
+﻿# 防止 AI 读取本地密钥与用户上传内容
+.env
+.env.*
+**/.credentials/
+**/credentials.*
+**/secrets.*
+**/*.local.json
+**/*.local.js
+project.private.config.json
+**/project.private.config.json
+private.*.key
+*.pem
+*.p12
+*.pfx
+*.key
+server/uploads/
+uploads/
+node_modules/
+miniprogram/miniprogram_npm/
+素材库/

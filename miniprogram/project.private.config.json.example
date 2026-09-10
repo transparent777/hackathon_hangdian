@@ -1,9 +1,9 @@
 {
-  "description": "本地私有配置模板 — 复制为 project.private.config.json 后填写",
+  "description": "本地私有配置 — 复制为 project.private.config.json 后填写真实 AppID（该文件已被 .gitignore）",
   "projectname": "cyber-companion",
-  "appid": "在这里填你的真实AppID",
+  "appid": "wx你的真实AppID",
   "setting": {
     "compileHotReLoad": true,
-    "urlCheck": false
+    "urlCheck": true
   }
 }

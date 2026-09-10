@@ -4,11 +4,19 @@ const express = require('express')
 const cors = require('cors')
 const multer = require('multer')
 
+require('dotenv').config({ path: path.join(__dirname, '.env') })
+
 const diaryPrompts = require('../ai/diary-prompts.json')
 
 const app = express()
-const PORT = process.env.PORT || 3000
-const upload = multer({ dest: path.join(__dirname, 'uploads') })
+const PORT = Number(process.env.PORT) || 3000
+const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES) || 10 * 1024 * 1024
+const uploadDir = path.join(__dirname, 'uploads')
+
+const upload = multer({
+  dest: uploadDir,
+  limits: { fileSize: MAX_UPLOAD_BYTES, files: 1 }
+})
 
 const RARITY_KEY = { 普通: 'normal', 稀有: 'rare', 传说: 'legendary' }
 
@@ -36,8 +44,29 @@ const FALLBACK_NOTES = {
   }
 }
 
-app.use(cors())
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+function createCorsOptions() {
+  const origins = (process.env.CORS_ORIGINS || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+
+  if (!origins.length) {
+    return { origin: true }
+  }
+
+  return {
+    origin(origin, callback) {
+      if (!origin || origins.includes(origin)) {
+        callback(null, true)
+        return
+      }
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+app.use(cors(createCorsOptions()))
+app.use('/uploads', express.static(uploadDir, { dotfiles: 'deny', index: false }))
 
 function getFontStyle(characterId) {
   return diaryPrompts.characters[characterId]?.fontStyle || characterId || 'naiwa'
@@ -49,28 +78,38 @@ function getDiaryNote(characterId, rarityLabel) {
   if (!char) {
     return FALLBACK_NOTES.naiwa[rarityKey]
   }
-  // TODO: 接入多模态 API，使用 char.rarityLevels[rarityKey].prompt + 溶图结果
+
+  // TODO: 接入多模态 API — 使用 process.env.AI_API_KEY，禁止硬编码
+  // const prompt = char.rarityLevels[rarityKey].prompt
   return FALLBACK_NOTES[characterId]?.[rarityKey] || FALLBACK_NOTES.naiwa[rarityKey]
 }
 
-app.post('/api/blend', upload.single('image'), (req, res) => {
-  const characterId = req.body.characterId || 'naiwa'
-  const rarity = req.body.rarity || '普通'
-  const file = req.file
+app.post('/api/blend', (req, res) => {
+  upload.single('image')(req, res, (error) => {
+    if (error) {
+      const message = error.code === 'LIMIT_FILE_SIZE' ? '图片过大' : '上传失败'
+      res.status(400).json({ message })
+      return
+    }
 
-  if (!file) {
-    res.status(400).json({ message: '缺少图片' })
-    return
-  }
+    const characterId = req.body.characterId || 'naiwa'
+    const rarity = req.body.rarity || '普通'
+    const file = req.file
 
-  const resultUrl = `/uploads/${file.filename}`
+    if (!file) {
+      res.status(400).json({ message: '缺少图片' })
+      return
+    }
 
-  res.json({
-    resultUrl: `http://localhost:${PORT}${resultUrl}`,
-    companionText: QUOTES[characterId] || QUOTES.naiwa,
-    diaryNote: getDiaryNote(characterId, rarity),
-    fontStyle: getFontStyle(characterId),
-    taskId: `blend-${Date.now()}`
+    const resultUrl = `/uploads/${file.filename}`
+
+    res.json({
+      resultUrl: `http://localhost:${PORT}${resultUrl}`,
+      companionText: QUOTES[characterId] || QUOTES.naiwa,
+      diaryNote: getDiaryNote(characterId, rarity),
+      fontStyle: getFontStyle(characterId),
+      taskId: `blend-${Date.now()}`
+    })
   })
 })
 
@@ -90,12 +129,14 @@ app.post('/api/roll', (_req, res) => {
   })
 })
 
-if (!fs.existsSync(path.join(__dirname, 'uploads'))) {
-  fs.mkdirSync(path.join(__dirname, 'uploads'), { recursive: true })
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true })
 }
 
 app.listen(PORT, () => {
   console.log(`[server] http://localhost:${PORT}`)
   console.log('[server] POST /api/blend  POST /api/roll')
-  console.log('[server] diaryNote 当前为占位文案，请接入多模态后替换 getDiaryNote()')
+  if (!process.env.AI_API_KEY) {
+    console.log('[server] AI_API_KEY 未配置，diaryNote 使用占位文案')
+  }
 })
