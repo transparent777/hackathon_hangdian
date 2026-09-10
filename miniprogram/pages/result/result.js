@@ -9,7 +9,8 @@ Page({
     characterName: '',
     characterId: '',
     characterImage: '',
-    sourceImagePath: ''
+    sourceImagePath: '',
+    isHistoryView: false
   },
 
   onLoad(options) {
@@ -20,7 +21,8 @@ Page({
       characterName: decodeURIComponent(options.name || character.name),
       characterId: options.characterId || character.characterId,
       characterImage: decodeURIComponent(options.characterImage || '') || character.image,
-      sourceImagePath: decodeURIComponent(options.sourceImagePath || '')
+      sourceImagePath: decodeURIComponent(options.sourceImagePath || ''),
+      isHistoryView: options.from === 'history'
     })
   },
 

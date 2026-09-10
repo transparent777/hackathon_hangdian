@@ -24,12 +24,14 @@
         open-type="share"
       />
       <action-pill
+        wx:if="{{!isHistoryView}}"
         variant="secondary"
         text="再拍一张"
         icon="photograph"
         catch:tap="retakePhoto"
       />
       <action-pill
+        wx:if="{{!isHistoryView}}"
         variant="secondary"
         text="返回首页"
         icon="wap-home-o"
