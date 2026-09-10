@@ -1,4 +1,5 @@
 const { getCharacterById } = require('../../utils/characters')
+const { saveImageToAlbum, handleSaveImageError } = require('../../utils/save-image')
 
 Page({
   data: {
@@ -28,24 +29,20 @@ Page({
     }
   },
 
-  saveImage() {
+  async saveImage() {
     const { imageUrl } = this.data
     if (!imageUrl) return
 
-    wx.saveImageToPhotosAlbum({
-      filePath: imageUrl,
-      success: () => wx.showToast({ title: '已保存原图', icon: 'success' }),
-      fail: () => {
-        wx.showModal({
-          title: '需要相册权限',
-          content: '请在设置中允许保存到相册',
-          confirmText: '去设置',
-          success: (res) => {
-            if (res.confirm) wx.openSetting()
-          }
-        })
+    try {
+      const stablePath = await saveImageToAlbum(imageUrl)
+      if (stablePath !== imageUrl) {
+        this.setData({ imageUrl: stablePath })
       }
-    })
+      wx.showToast({ title: '已保存到相册', icon: 'success' })
+    } catch (error) {
+      console.error('save image failed', error)
+      handleSaveImageError(error)
+    }
   },
 
   retakePhoto() {

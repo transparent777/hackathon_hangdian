@@ -47,7 +47,7 @@ Page({
     this.setData({ blending: true })
     try {
       const result = await fetchBlend({ characterId, imagePath })
-      await addHistory({
+      const historyItem = await addHistory({
         characterId,
         characterName,
         characterImage,
@@ -56,7 +56,7 @@ Page({
       })
 
       wx.navigateTo({
-        url: `/pages/result/result?imageUrl=${encodeURIComponent(result.resultUrl)}&quote=${encodeURIComponent(result.companionText)}&name=${encodeURIComponent(characterName)}&characterId=${characterId}&characterImage=${encodeURIComponent(characterImage)}`
+        url: `/pages/result/result?imageUrl=${encodeURIComponent(historyItem.imageUrl)}&quote=${encodeURIComponent(result.companionText)}&name=${encodeURIComponent(characterName)}&characterId=${characterId}&characterImage=${encodeURIComponent(characterImage)}`
       })
     } catch (error) {
       wx.showToast({ title: '溶图失败，请重试', icon: 'none' })

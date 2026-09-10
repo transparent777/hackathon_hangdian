@@ -10,7 +10,12 @@ function getHistory() {
   }
 }
 
-function saveImageFile(tempPath) {
+function isTempImagePath(filePath) {
+  if (!filePath) return false
+  return filePath.startsWith('wxfile://') || filePath.includes('tmp') || filePath.startsWith('http://tmp')
+}
+
+function persistImagePath(tempPath) {
   return new Promise((resolve, reject) => {
     wx.getFileSystemManager().saveFile({
       tempFilePath: tempPath,
@@ -25,8 +30,8 @@ async function addHistory(record) {
   let savedImagePath = record.imageUrl
 
   try {
-    if (record.imageUrl && (record.imageUrl.startsWith('wxfile://') || record.imageUrl.includes('tmp'))) {
-      savedImagePath = await saveImageFile(record.imageUrl)
+    if (isTempImagePath(record.imageUrl)) {
+      savedImagePath = await persistImagePath(record.imageUrl)
     }
   } catch (error) {
     console.warn('save history image failed, use temp path', error)
@@ -56,5 +61,7 @@ module.exports = {
   getHistory,
   addHistory,
   removeHistory,
+  isTempImagePath,
+  persistImagePath,
   MAX_ITEMS
 }
