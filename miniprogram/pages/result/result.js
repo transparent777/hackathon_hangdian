@@ -8,7 +8,8 @@ Page({
     quote: '',
     characterName: '',
     characterId: '',
-    characterImage: ''
+    characterImage: '',
+    sourceImagePath: ''
   },
 
   onLoad(options) {
@@ -18,7 +19,8 @@ Page({
       quote: decodeURIComponent(options.quote || ''),
       characterName: decodeURIComponent(options.name || character.name),
       characterId: options.characterId || character.characterId,
-      characterImage: decodeURIComponent(options.characterImage || '') || character.image
+      characterImage: decodeURIComponent(options.characterImage || '') || character.image,
+      sourceImagePath: decodeURIComponent(options.sourceImagePath || '')
     })
   },
 
@@ -50,11 +52,12 @@ Page({
     if (this._retakeLock) return
     this._retakeLock = true
 
-    const { characterId, characterName, characterImage } = this.data
+    const { characterId, characterName, characterImage, sourceImagePath } = this.data
     const url = buildCameraPageUrl({
       characterId,
       name: characterName,
-      image: characterImage
+      image: characterImage,
+      imagePath: sourceImagePath
     })
 
     wx.redirectTo({
@@ -65,5 +68,9 @@ Page({
         this._retakeLock = false
       }
     })
+  },
+
+  goHome() {
+    wx.switchTab({ url: '/pages/index/index' })
   }
 })

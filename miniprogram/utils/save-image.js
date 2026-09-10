@@ -1,4 +1,4 @@
-const { isTempImagePath, persistImagePath } = require('./history')
+const { isTempImagePath, persistImagePath } = require('./image-path')
 
 function ensureAlbumAuth() {
   return new Promise((resolve, reject) => {

@@ -10,7 +10,7 @@ function inferRarityFromCover(imagePath) {
   return RARITY_BY_COVER_KEY[match[1]] || '普通'
 }
 
-function buildCameraPageUrl({ characterId, name, image, rarity }) {
+function buildCameraPageUrl({ characterId, name, image, rarity, imagePath }) {
   const resolvedRarity = rarity || inferRarityFromCover(image)
   const params = [
     `characterId=${characterId}`,
@@ -18,6 +18,10 @@ function buildCameraPageUrl({ characterId, name, image, rarity }) {
     `rarity=${encodeURIComponent(resolvedRarity)}`,
     `image=${encodeURIComponent(image || '')}`
   ]
+
+  if (imagePath) {
+    params.push(`imagePath=${encodeURIComponent(imagePath)}`)
+  }
 
   return `/pages/camera/camera?${params.join('&')}`
 }

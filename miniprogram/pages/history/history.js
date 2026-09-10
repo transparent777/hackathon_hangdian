@@ -15,7 +15,7 @@ Page({
   openItem(e) {
     const { item } = e.currentTarget.dataset
     wx.navigateTo({
-      url: `/pages/result/result?imageUrl=${encodeURIComponent(item.imageUrl)}&quote=${encodeURIComponent(item.quote)}&name=${encodeURIComponent(item.characterName)}&characterId=${item.characterId}&characterImage=${encodeURIComponent(item.characterImage || '')}`
+      url: `/pages/result/result?imageUrl=${encodeURIComponent(item.imageUrl)}&quote=${encodeURIComponent(item.quote)}&name=${encodeURIComponent(item.characterName)}&characterId=${item.characterId}&characterImage=${encodeURIComponent(item.characterImage || '')}&sourceImagePath=${encodeURIComponent(item.sourceImagePath || item.imageUrl)}`
     })
   }
 })

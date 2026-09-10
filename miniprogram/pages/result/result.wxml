@@ -29,6 +29,12 @@
         icon="photograph"
         catch:tap="retakePhoto"
       />
+      <action-pill
+        variant="secondary"
+        text="返回首页"
+        icon="wap-home-o"
+        catch:tap="goHome"
+      />
     </view>
   </view>
 </view>
