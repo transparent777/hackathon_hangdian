@@ -4,6 +4,7 @@
 async function blendImage({ sourceImagePath, publicResultPath }) {
   return {
     resultUrl: publicResultPath,
+    localPath: sourceImagePath,
     provider: 'mock',
     blended: false
   }

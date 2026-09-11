@@ -23,27 +23,33 @@ server/services/ai/        运行时：blend + diary + providers
 | `AI_MODE` | 行为 |
 |-----------|------|
 | `mock` | 溶图回传原图 URL，日记用 fallback 文案 |
-| `live` | 火山方舟 Seedream 5.0 溶图（`providers/http.js`） |
+| `live` | 溶图走火山方舟 Seedream 5.0；日记走 DeepSeek 多模态（各自 Key） |
 
-**火山方舟 Seedream 5.0 `.env` 示例**（Key 自行填入，勿提交）：
+**`.env` 示例**（Key 自行填入，勿提交）：
 
 ```env
 AI_MODE=live
-AI_API_KEY=你的密钥
+
+# 溶图 · 火山方舟
+AI_API_KEY=你的火山方舟密钥
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
 AI_BLEND_VARIANT=lite
-# AI_BLEND_VARIANT=pro
-# AI_BLEND_MODEL=doubao-seedream-5-0-pro-260628
 AI_BLEND_SIZE=2K
+
+# 日记批注 · DeepSeek V4.1-Flash
+AI_DIARY_API_KEY=你的DeepSeek密钥
+AI_DIARY_API_BASE_URL=https://api.deepseek.com
+AI_DIARY_MODEL=deepseek-flash
+
 PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-| `AI_BLEND_VARIANT` | 模型 |
+| `AI_BLEND_VARIANT` | 溶图模型 |
 |--------------------|------|
 | `lite`（默认） | `doubao-seedream-5-0-260128` |
 | `pro` | `doubao-seedream-5-0-pro-260628` |
 
-详见 `ai/README.md`。接入真实 API 时只改 `providers/http.js`，**密钥勿写进代码**。
+溶图：`providers/http.js` · 日记：`providers/deepseek.js`。**密钥勿写进代码**。
 
 ## 安全
 

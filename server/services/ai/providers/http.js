@@ -7,6 +7,7 @@
  * - Pro:  doubao-seedream-5-0-pro-260628
  */
 const fs = require('fs')
+const path = require('path')
 const { fileToDataUri, downloadImageToDir } = require('../image-utils')
 const { resolveBlendSize } = require('../config')
 
@@ -139,6 +140,7 @@ async function blendImage(ctx) {
 
   return {
     resultUrl,
+    localPath: path.join(uploadDir, filename),
     provider: 'volcengine-seedream-5',
     blended: true,
     remoteUrl,
@@ -146,22 +148,7 @@ async function blendImage(ctx) {
   }
 }
 
-async function generateDiaryNote(ctx) {
-  const { config, fallbackText } = ctx
-
-  if (!config.apiKey) {
-    throw new Error('AI_API_KEY 未配置')
-  }
-
-  console.warn('[ai/http] diary 多模态未接入，使用 fallback 文案')
-  return {
-    diaryNote: fallbackText,
-    provider: 'fallback'
-  }
-}
-
 module.exports = {
   AiProviderNotImplementedError,
-  blendImage,
-  generateDiaryNote
+  blendImage
 }

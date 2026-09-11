@@ -7,7 +7,10 @@
   },
   "diary": {
     "timeoutMs": 45000,
-    "maxRetries": 1
+    "maxRetries": 1,
+    "provider": "deepseek",
+    "model": "deepseek-flash",
+    "defaultBaseUrl": "https://api.deepseek.com"
   },
   "seedream": {
     "models": {

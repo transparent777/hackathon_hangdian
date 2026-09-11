@@ -1,12 +1,12 @@
 const { loadAiRuntimeConfig } = require('./config')
 const { getDiaryPromptBundle, RARITY_KEY } = require('./prompts')
 const { getFallbackDiaryNote } = require('./fallbacks')
-const { getProvider } = require('./providers')
+const { getDiaryProvider } = require('./providers')
 const mockProvider = require('./providers/mock')
 
 async function runDiary({ characterId, rarityLabel, imagePath }) {
   const config = loadAiRuntimeConfig()
-  const provider = getProvider(config)
+  const provider = getDiaryProvider(config)
   const rarityKey = RARITY_KEY[rarityLabel] || 'normal'
   const promptBundle = getDiaryPromptBundle(characterId, rarityLabel)
   const fallbackText = getFallbackDiaryNote(characterId, rarityKey)
@@ -26,10 +26,10 @@ async function runDiary({ characterId, rarityLabel, imagePath }) {
     return {
       diaryNote: result.diaryNote || fallbackText,
       fontStyle: promptBundle.fontStyle,
-      provider: result.provider || (config.isLive ? 'http' : 'mock')
+      provider: result.provider || (config.isDiaryLive ? 'deepseek' : 'mock')
     }
   } catch (error) {
-    if (config.isLive) {
+    if (config.isDiaryLive) {
       console.warn('[ai/diary] live failed, fallback mock:', error.message)
       const result = await mockProvider.generateDiaryNote(ctx)
       return {

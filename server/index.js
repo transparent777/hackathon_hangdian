@@ -50,7 +50,8 @@ app.get('/api/health', (_req, res) => {
     ts: Date.now(),
     ai: {
       mode: aiConfig.mode,
-      live: aiConfig.isLive
+      live: aiConfig.isLive,
+      diaryLive: aiConfig.isDiaryLive
     }
   })
 })
@@ -87,7 +88,7 @@ app.post('/api/blend', (req, res) => {
       const diaryResult = await runDiary({
         characterId,
         rarityLabel: rarity,
-        imagePath: file.path
+        imagePath: blendResult.localPath || file.path
       })
 
       res.json({

@@ -21,14 +21,17 @@
 server/services/ai/blend.js  ──读──► ai/prompts/{id}.json
         │
         ▼
-providers/mock.js   AI_MODE=mock（默认，回传原图 URL）
-providers/http.js   AI_MODE=live + AI_API_KEY（待接入真实 API）
+providers/mock.js     AI_MODE=mock（默认，回传原图 URL）
+providers/http.js     AI_MODE=live + AI_API_KEY（火山方舟 Seedream 溶图）
         │
         ▼
 溶图结果图 URL
         │
         ▼
 server/services/ai/diary.js  ──读──► ai/diary-prompts.json
+        │
+        ▼
+providers/deepseek.js  AI_DIARY_API_KEY（DeepSeek 看图写批注）
         │
         ▼
 diaryNote + fontStyle → 返回小程序
@@ -48,6 +51,11 @@ AI_BLEND_VARIANT=lite          # lite | pro | 4.5
 # AI_BLEND_MODEL=doubao-seedream-5-0-pro-260628
 
 AI_BLEND_SIZE=2K               # lite: 2K/3K/4K；pro: 1K/2K
+
+AI_DIARY_API_KEY=你的DeepSeek密钥
+AI_DIARY_API_BASE_URL=https://api.deepseek.com
+AI_DIARY_MODEL=deepseek-flash
+
 PUBLIC_BASE_URL=http://localhost:3000
 ```
 
@@ -57,4 +65,4 @@ PUBLIC_BASE_URL=http://localhost:3000
 | `pro` | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，画质更好 |
 | `4.5` | `doubao-seedream-4-5-251128` | 旧版兼容 |
 
-溶图：`server/services/ai/providers/http.js`。日记批注多模态仍 fallback。
+溶图：`providers/http.js` · 日记：`providers/deepseek.js`。
