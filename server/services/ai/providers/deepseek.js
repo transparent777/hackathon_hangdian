@@ -3,6 +3,9 @@
  * 文档：https://api-docs.deepseek.com/guides/vision
  */
 const { fileToDataUri } = require('../image-utils')
+const { fetchJson } = require('../http')
+const { cleanNote, hitsForbidden, truncateNote } = require('../note')
+const { AIExtractError } = require('../errors')
 
 const DEFAULT_BASE = 'https://api.deepseek.com'
 const DEFAULT_MODEL = 'deepseek-flash'
@@ -44,69 +47,48 @@ function extractAssistantContent(message) {
   return ''
 }
 
-function sanitizeDiaryText(text, maxLength) {
-  let s = String(text || '').trim()
-  s = s.replace(/^["'「『]+|["'」』]+$/g, '')
-  s = s.replace(/\n+/g, '')
-  if (maxLength && s.length > maxLength) {
-    s = s.slice(0, maxLength)
-  }
-  return s
-}
-
-async function callDeepSeekVision(config, { system, userText, imageDataUri }) {
+async function callDeepSeekVision(config, { system, userText, imageDataUri, timeoutMs, deadline }) {
   const baseUrl = (config.diaryApiBaseUrl || DEFAULT_BASE).replace(/\/$/, '')
   const url = `${baseUrl}/v1/chat/completions`
-  const timeoutMs = config.diaryTimeoutMs || 45000
 
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  const { json } = await fetchJson(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.diaryApiKey}`
+    },
+    body: {
+      model: config.diaryModel || DEFAULT_MODEL,
+      messages: [
+        { role: 'system', content: system },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: userText },
+            { type: 'image_url', image_url: { url: imageDataUri } }
+          ]
+        }
+      ],
+      max_tokens: 256,
+      temperature: 0.8
+    },
+    timeoutMs,
+    retryMax: config.retryMax,
+    deadline
+  })
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.diaryApiKey}`
-      },
-      body: JSON.stringify({
-        model: config.diaryModel || DEFAULT_MODEL,
-        messages: [
-          { role: 'system', content: system },
-          {
-            role: 'user',
-            content: [
-              { type: 'text', text: userText },
-              { type: 'image_url', image_url: { url: imageDataUri } }
-            ]
-          }
-        ],
-        max_tokens: 256,
-        temperature: 0.8
-      }),
-      signal: controller.signal
-    })
-
-    const payload = await response.json().catch(() => ({}))
-
-    if (!response.ok) {
-      const message = payload.error?.message || payload.message || `HTTP ${response.status}`
-      throw new Error(`DeepSeek 请求失败: ${message}`)
-    }
-
-    const content = extractAssistantContent(payload.choices?.[0]?.message)
-    if (!content) {
-      throw new Error('DeepSeek 未返回日记批注')
-    }
-
-    return content
-  } finally {
-    clearTimeout(timer)
+  const content = extractAssistantContent(json.choices?.[0]?.message)
+  if (!content) {
+    throw new AIExtractError('DeepSeek 未返回日记批注', { code: 'NO_TEXT' })
   }
+
+  return content
 }
 
 async function generateDiaryNote(ctx) {
   const { config, promptBundle, imagePath, fallbackText } = ctx
+  const timeoutMs = ctx.timeoutMs || config.diaryTimeoutMs
+  const deadline = ctx.deadline || 0
 
   if (!config.diaryApiKey) {
     throw new Error('AI_DIARY_API_KEY 未配置')
@@ -122,21 +104,28 @@ async function generateDiaryNote(ctx) {
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      const raw = await callDeepSeekVision(config, { system, userText, imageDataUri })
-      const diaryNote = sanitizeDiaryText(raw, promptBundle.maxLength)
+      const raw = await callDeepSeekVision(config, { system, userText, imageDataUri, timeoutMs, deadline })
+      const cleaned = cleanNote(raw)
+      if (!cleaned) {
+        throw new AIExtractError('批注清洗后为空', { code: 'EMPTY_NOTE' })
+      }
+      if (hitsForbidden(cleaned, promptBundle.outputRules)) {
+        throw new AIExtractError('批注命中禁词', { code: 'FORBIDDEN_WORD' })
+      }
+      const diaryNote = truncateNote(cleaned, promptBundle.maxLength)
       if (diaryNote && diaryNote.length >= 4) {
         return {
           diaryNote,
           provider: 'deepseek-flash'
         }
       }
-      lastError = new Error('DeepSeek 返回批注过短')
+      lastError = new AIExtractError('DeepSeek 返回批注过短', { code: 'TOO_SHORT' })
     } catch (error) {
       lastError = error
     }
   }
 
-  throw lastError || new Error('DeepSeek 未返回日记批注')
+  throw lastError || new Error(fallbackText || 'DeepSeek 未返回日记批注')
 }
 
 module.exports = {

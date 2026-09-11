@@ -1,27 +1,16 @@
 /**
  * 火山方舟 · 豆包 Seedream 5.0 溶图（live）
  * 文档：https://www.volcengine.com/docs/82379
- *
- * 模型 ID（须写全）：
- * - Lite: doubao-seedream-5-0-260128
- * - Pro:  doubao-seedream-5-0-pro-260628
  */
 const fs = require('fs')
 const path = require('path')
 const { fileToDataUri, downloadImageToDir } = require('../image-utils')
 const { resolveBlendSize } = require('../config')
+const { fetchJson } = require('../http')
 
 const DEFAULT_ARK_BASE = 'https://ark.cn-beijing.volces.com'
 const DEFAULT_BLEND_MODEL = 'doubao-seedream-5-0-260128'
-
 const PRO_MODEL_ID = 'doubao-seedream-5-0-pro-260628'
-
-class AiProviderNotImplementedError extends Error {
-  constructor(feature) {
-    super(`[ai/http] ${feature} 尚未实现`)
-    this.code = 'AI_NOT_IMPLEMENTED'
-  }
-}
 
 function resolveArkBaseUrl(config) {
   return (config.apiBaseUrl || DEFAULT_ARK_BASE).replace(/\/$/, '')
@@ -60,51 +49,35 @@ function buildSeedreamBody({ model, prompt, images }) {
     watermark: process.env.AI_BLEND_WATERMARK !== 'false'
   }
 
-  // Pro 不支持组图；Lite / 4.x 关闭组图
   if (model !== PRO_MODEL_ID) {
     body.sequential_image_generation = 'disabled'
   }
 
-  // 图生图 / 多图融合：单张 string，多张 array
   body.image = images.length === 1 ? images[0] : images
-
   return body
 }
 
-async function callSeedreamGeneration(config, body) {
+async function callSeedreamGeneration(config, body, { timeoutMs, deadline }) {
   const url = `${resolveArkBaseUrl(config)}/api/v3/images/generations`
-  const timeoutMs = config.timeoutMs || 90000
 
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
+  const { json } = await fetchJson(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.apiKey}`
+    },
+    body,
+    timeoutMs,
+    retryMax: config.retryMax,
+    deadline
+  })
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    })
-
-    const payload = await response.json().catch(() => ({}))
-
-    if (!response.ok) {
-      const message = payload.error?.message || payload.message || `HTTP ${response.status}`
-      throw new Error(`Seedream 请求失败: ${message}`)
-    }
-
-    const resultUrl = payload.data?.[0]?.url
-    if (!resultUrl) {
-      throw new Error('Seedream 未返回图片 URL')
-    }
-
-    return resultUrl
-  } finally {
-    clearTimeout(timer)
+  const resultUrl = json.data?.[0]?.url
+  if (!resultUrl) {
+    throw new Error('Seedream 未返回图片 URL')
   }
+
+  return resultUrl
 }
 
 async function blendImage(ctx) {
@@ -114,7 +87,9 @@ async function blendImage(ctx) {
     referenceImagePath,
     sourceImagePath,
     publicBaseUrl,
-    uploadDir
+    uploadDir,
+    timeoutMs,
+    deadline
   } = ctx
 
   if (!config.apiKey) {
@@ -133,7 +108,10 @@ async function blendImage(ctx) {
     images
   })
 
-  const remoteUrl = await callSeedreamGeneration(config, body)
+  const remoteUrl = await callSeedreamGeneration(config, body, {
+    timeoutMs: timeoutMs || config.timeoutMs,
+    deadline: deadline || 0
+  })
 
   const filename = await downloadImageToDir(remoteUrl, uploadDir)
   const resultUrl = `${publicBaseUrl}/uploads/${filename}`
@@ -149,6 +127,5 @@ async function blendImage(ctx) {
 }
 
 module.exports = {
-  AiProviderNotImplementedError,
   blendImage
 }

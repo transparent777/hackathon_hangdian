@@ -1,7 +1,8 @@
 const path = require('path')
+const { readJson } = require('./read-json')
 
 const ROOT = path.join(__dirname, '../../..')
-const aiDefaults = require(path.join(ROOT, 'ai/config.json'))
+const aiDefaults = readJson(path.join(ROOT, 'ai/config.json')) || {}
 
 const SEEDREAM_MODELS = aiDefaults.seedream?.models || {}
 
@@ -33,6 +34,26 @@ function maskSecret(value) {
   return `${value.slice(0, 4)}***${value.slice(-2)}`
 }
 
+function envStr(name, fallback = '') {
+  const raw = process.env[name]
+  if (raw === undefined || raw === null) return fallback
+  const trimmed = String(raw).trim()
+  return trimmed === '' ? fallback : trimmed
+}
+
+function envInt(name, fallback) {
+  const raw = envStr(name)
+  if (raw === '') return fallback
+  const parsed = Number(raw)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function envBool(name, fallback = false) {
+  const raw = envStr(name).toLowerCase()
+  if (raw === '') return fallback
+  return raw === '1' || raw === 'true' || raw === 'yes' || raw === 'on'
+}
+
 function loadAiRuntimeConfig() {
   const mode = (process.env.AI_MODE || 'mock').toLowerCase()
   const apiKey = process.env.AI_API_KEY || ''
@@ -61,9 +82,42 @@ function loadAiRuntimeConfig() {
       /\/$/,
       ''
     ),
+    concurrency: Math.max(1, envInt('AI_MAX_CONCURRENCY', 4)),
+    retryMax: Math.max(0, envInt('AI_RETRY_MAX', aiDefaults.blend?.maxRetries ?? 1)),
+    routeBudgetMs: envInt('BLEND_ROUTE_BUDGET_MS', 52000),
+    uploadTtlHours: envInt('UPLOAD_TTL_HOURS', 24),
+    healthExposeErrors: envBool('HEALTH_EXPOSE_ERRORS', true),
     isLive: mode === 'live' && Boolean(apiKey),
     isDiaryLive: mode === 'live' && Boolean(diaryApiKey)
   }
+}
+
+function describeAiHealth() {
+  const { CHARACTER_IDS, getBlendPromptSource } = require('./prompts')
+  const { getLastError, semaphoreStats } = require('./runtime')
+  const config = loadAiRuntimeConfig()
+  const stats = semaphoreStats()
+  const out = {
+    mode: config.mode,
+    live: config.isLive,
+    diaryLive: config.isDiaryLive,
+    blendModel: config.blendModel,
+    diaryModel: config.diaryModel,
+    concurrency: { limit: config.concurrency, active: stats.active, pending: stats.pending },
+    uploadTtlHours: config.uploadTtlHours,
+    routeBudgetMs: config.routeBudgetMs
+  }
+
+  out.blendPrompts = {}
+  for (const id of CHARACTER_IDS) {
+    out.blendPrompts[id] = getBlendPromptSource(id)
+  }
+
+  if (config.healthExposeErrors) {
+    out.lastError = getLastError()
+  }
+
+  return out
 }
 
 function logAiBootSummary(config) {
@@ -74,6 +128,7 @@ function logAiBootSummary(config) {
 
 module.exports = {
   loadAiRuntimeConfig,
+  describeAiHealth,
   resolveBlendModel,
   resolveBlendSize,
   maskSecret,

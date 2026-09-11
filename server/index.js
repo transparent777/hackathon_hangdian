@@ -7,8 +7,12 @@ const multer = require('multer')
 require('dotenv').config({ path: path.join(__dirname, '.env') })
 
 const { initAi, runBlend, runDiary, rollCharacter, pickQuote } = require('./services/ai')
+const { describeAiHealth } = require('./services/ai/config')
 const { getDiaryPromptBundle, RARITY_KEY } = require('./services/ai/prompts')
 const { getFallbackDiaryNote } = require('./services/ai/fallbacks')
+const { startUploadsSweeper } = require('./services/ai/cleanup')
+const { log } = require('./services/ai/log')
+const { AIConfigError } = require('./services/ai/errors')
 
 const app = express()
 const PORT = Number(process.env.PORT) || 3000
@@ -16,6 +20,11 @@ const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES) || 10 * 1024 * 102
 const uploadDir = path.join(__dirname, 'uploads')
 
 const aiConfig = initAi()
+startUploadsSweeper({
+  dir: uploadDir,
+  ttlMs: aiConfig.uploadTtlHours * 60 * 60 * 1000,
+  logger: log
+})
 
 const upload = multer({
   dest: uploadDir,
@@ -50,11 +59,7 @@ app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     ts: Date.now(),
-    ai: {
-      mode: aiConfig.mode,
-      live: aiConfig.isLive,
-      diaryLive: aiConfig.isDiaryLive
-    }
+    ai: describeAiHealth()
   })
 })
 
@@ -79,14 +84,17 @@ app.post('/api/blend', (req, res) => {
       return
     }
 
-    console.log('[blend] request', characterId, rarity, file?.originalname || file?.filename)
+    log.info('blend request', { characterId, rarity, file: file?.originalname || file?.filename })
+
+    const deadline = Date.now() + aiConfig.routeBudgetMs
 
     try {
       const blendResult = await runBlend({
         characterId,
         rarityLabel: rarity,
         sourceFile: file,
-        publicBaseUrl: aiConfig.publicBaseUrl
+        publicBaseUrl: aiConfig.publicBaseUrl,
+        deadline
       })
 
       const rarityKey = RARITY_KEY[rarity] || 'normal'
@@ -97,24 +105,18 @@ app.post('/api/blend', (req, res) => {
         provider: 'fallback'
       }
 
-      const diaryTimeoutMs = Number(process.env.AI_DIARY_TIMEOUT_MS) || 45000
-
       try {
-        diaryResult = await Promise.race([
-          runDiary({
-            characterId,
-            rarityLabel: rarity,
-            imagePath: blendResult.localPath || file.path
-          }),
-          new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('diary timeout')), diaryTimeoutMs)
-          })
-        ])
+        diaryResult = await runDiary({
+          characterId,
+          rarityLabel: rarity,
+          imagePath: blendResult.localPath || file.path,
+          deadline
+        })
       } catch (diaryError) {
-        console.warn('[blend] diary skipped:', diaryError.message)
+        log.warn('diary skipped', log.sanitize(diaryError.message))
       }
 
-      console.log('[blend] diary provider:', diaryResult.provider || 'fallback')
+      log.info('diary provider', diaryResult.provider || 'fallback')
 
       res.json({
         resultUrl: blendResult.resultUrl,
@@ -125,7 +127,11 @@ app.post('/api/blend', (req, res) => {
         taskId: `blend-${Date.now()}`
       })
     } catch (err) {
-      console.error('[blend]', err)
+      if (err instanceof AIConfigError && err.code === 'UNSUPPORTED_MIME') {
+        res.status(400).json({ message: err.message })
+        return
+      }
+      log.error('blend failed', err)
       res.status(500).json({ message: '溶图处理失败' })
     }
   })
