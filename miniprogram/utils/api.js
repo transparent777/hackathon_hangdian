@@ -1,11 +1,19 @@
 const { rollCharacter } = require('./characters')
-const { mockBlend } = require('./mock')
 
 function getAppConfig() {
   const app = getApp()
   return {
     apiBaseUrl: app.globalData.apiBaseUrl,
     useMock: app.globalData.useMock
+  }
+}
+
+function assertBlendResult(data) {
+  if (!data?.resultUrl) {
+    throw new Error('溶图返回缺少结果图')
+  }
+  if (data.blended === false) {
+    throw new Error('溶图失败，未生成合成图')
   }
 }
 
@@ -54,7 +62,7 @@ function checkApiHealth() {
         }
         reject(new Error(`后端异常 HTTP ${res.statusCode}`))
       },
-      fail: (error) => {
+      fail: () => {
         reject(new Error(`连不上后端 ${apiBaseUrl}，请先 cd server && npm start`))
       }
     })
@@ -71,7 +79,6 @@ function assertUploadableFile(imagePath) {
   })
 }
 
-// B 联调：uploadFile 溶图
 function uploadBlend({ characterId, imagePath, openid, rarity }) {
   const { apiBaseUrl } = getAppConfig()
   const uploadUrl = `${apiBaseUrl}/blend`
@@ -85,31 +92,32 @@ function uploadBlend({ characterId, imagePath, openid, rarity }) {
           filePath: imagePath,
           name: 'image',
           timeout: 180000,
-      formData: {
-        characterId,
-        openid: openid || '',
-        rarity: rarity || '普通'
-      },
-      success: (res) => {
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          try {
-            const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
-            resolve(data)
-            return
-          } catch (error) {
-            reject(new Error('溶图返回解析失败'))
-            return
-          }
-        }
-        let message = '溶图失败'
-        try {
-          const errData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
-          message = errData?.message || message
-        } catch (error) {
-          // ignore parse error
-        }
-        reject(new Error(message))
-      },
+          formData: {
+            characterId,
+            openid: openid || '',
+            rarity: rarity || '普通'
+          },
+          success: (res) => {
+            let data
+            try {
+              data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+            } catch (error) {
+              reject(new Error('溶图返回解析失败'))
+              return
+            }
+
+            if (res.statusCode >= 200 && res.statusCode < 300) {
+              try {
+                assertBlendResult(data)
+                resolve(data)
+              } catch (error) {
+                reject(error)
+              }
+              return
+            }
+
+            reject(new Error(data?.message || '溶图失败'))
+          },
           fail: (error) => {
             const hint = String(error?.errMsg || error?.message || '')
             console.error('[uploadBlend] fail', uploadUrl, hint)
@@ -132,7 +140,7 @@ function fetchRoll() {
 async function fetchBlend({ characterId, imagePath, openid, rarity }) {
   const { useMock } = getAppConfig()
   if (useMock) {
-    return mockBlend({ characterId, imagePath, rarity })
+    throw new Error('溶图需要后端，请启动 server 并将 useMock 设为 false')
   }
   await checkApiHealth()
   return uploadBlend({ characterId, imagePath, openid, rarity })

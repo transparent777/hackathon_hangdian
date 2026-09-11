@@ -118,8 +118,14 @@ app.post('/api/blend', (req, res) => {
 
       log.info('diary provider', diaryResult.provider || 'fallback')
 
+      if (aiConfig.isLive && blendResult?.blended === false) {
+        res.status(500).json({ message: '溶图处理失败，未生成合成图' })
+        return
+      }
+
       res.json({
         resultUrl: blendResult.resultUrl,
+        blended: blendResult.blended !== false,
         companionText: pickQuote(characterId),
         diaryNote: diaryResult.diaryNote,
         fontStyle: diaryResult.fontStyle,
@@ -132,7 +138,10 @@ app.post('/api/blend', (req, res) => {
         return
       }
       log.error('blend failed', err)
-      res.status(500).json({ message: '溶图处理失败' })
+      const detail = err?.message ? String(err.message).slice(0, 120) : ''
+      res.status(500).json({
+        message: detail && !detail.includes('溶图') ? `溶图失败：${detail}` : '溶图处理失败，请稍后重试'
+      })
     }
   })
 })

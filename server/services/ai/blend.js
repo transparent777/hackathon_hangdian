@@ -2,7 +2,6 @@ const path = require('path')
 const { loadAiRuntimeConfig } = require('./config')
 const { buildBlendPromptText, resolveReferenceImagePath, loadBlendPrompt } = require('./prompts')
 const { getProvider } = require('./providers')
-const mockProvider = require('./providers/mock')
 const { withSlot, remainingMs } = require('./runtime')
 const { assertSupportedImageFile } = require('./image-utils')
 const { log } = require('./log')
@@ -42,15 +41,15 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
     deadline
   }
 
-  try {
-    return await withSlot({ deadline, waitMs: Math.min(5000, timeoutMs) }, () => provider.blendImage(ctx))
-  } catch (error) {
-    if (config.isLive) {
-      log.warn('live 溶图失败，降级 mock', log.sanitize(error.message))
-      return mockProvider.blendImage(ctx)
-    }
-    throw error
+  const result = await withSlot({ deadline, waitMs: Math.min(5000, timeoutMs) }, () =>
+    provider.blendImage(ctx)
+  )
+
+  if (config.isLive && result?.blended === false) {
+    throw new Error('AI 溶图未产出合成图')
   }
+
+  return result
 }
 
 module.exports = {

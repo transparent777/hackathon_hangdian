@@ -1,3 +1,7 @@
+function isRemoteUrl(filePath) {
+  return /^https?:\/\//i.test(String(filePath || ''))
+}
+
 function isTempImagePath(filePath) {
   if (!filePath) return false
   if (filePath.startsWith('http://tmp') || filePath.startsWith('https://tmp')) return true
@@ -52,7 +56,7 @@ async function ensureStableImagePath(filePath) {
     throw new Error('image path is empty')
   }
 
-  if (/^https?:\/\//i.test(filePath)) {
+  if (isRemoteUrl(filePath)) {
     return downloadRemoteImage(filePath)
   }
 
@@ -73,6 +77,7 @@ async function ensureStableImagePath(filePath) {
 }
 
 module.exports = {
+  isRemoteUrl,
   isTempImagePath,
   persistImagePath,
   ensureStableImagePath,
