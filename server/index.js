@@ -113,6 +113,10 @@ app.post('/api/blend', (req, res) => {
   })
 })
 
+app.get('/api/health', (_req, res) => {
+  res.json({ ok: true, ts: Date.now() })
+})
+
 app.post('/api/roll', (_req, res) => {
   const ids = ['naiwa', 'doro', 'maodie']
   const names = { naiwa: '奶蛙', doro: 'doro', maodie: '耄耋' }
@@ -135,7 +139,7 @@ if (!fs.existsSync(uploadDir)) {
 
 app.listen(PORT, () => {
   console.log(`[server] http://localhost:${PORT}`)
-  console.log('[server] POST /api/blend  POST /api/roll')
+  console.log('[server] GET /api/health  POST /api/blend  POST /api/roll')
   if (!process.env.AI_API_KEY) {
     console.log('[server] AI_API_KEY 未配置，diaryNote 使用占位文案')
   }

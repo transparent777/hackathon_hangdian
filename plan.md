@@ -52,17 +52,17 @@ D 发现 bug → 记入 docs/bugs.md → 对应负责人修，D 回归测一遍
 
 ## 三、MVP 功能清单（必须做）
 
-- [ ] 每日 roll 一只陪伴兽（奶蛙 / doro / 耄耋）
-- [ ] 拍照或相册选图
-- [ ] 上传 → AI 溶图 → 返回结果图
-- [ ] 结果页：图片 + 角色名 + 一句陪伴语
-- [ ] 保存到相册 / 转发好友
-- [ ] 简单历史记录（最近 10 条）
+- [x] 每日 roll 一只陪伴兽（奶蛙 / doro / 耄耋）
+- [x] 拍照或相册选图
+- [x] 上传 → AI 溶图 → 返回结果图（Mock 可演示；真 API 待联调）
+- [x] 结果页：图片 + 角色名 + 一句陪伴语
+- [x] 保存到相册 / 转发好友
+- [x] 简单历史记录（最近 10 条）
 
 ### 加分项（有余力再做）
 
 - [ ] roll 稀有度动画（A）
-- [ ] 陪伴日记时间线 UI（A）
+- [x] 陪伴日记时间线 UI（A）
 - [ ] loading 趣味文案轮播（**D 写文案 JSON**，A 实现）
 
 ### 明确不做
@@ -216,6 +216,16 @@ D 发现 bug → 记入 docs/bugs.md → 对应负责人修，D 回归测一遍
 | **D** | 终轮回归测试；PPT 终版 + **主讲排练 2 遍**（A 站旁边保底 demo） |
 
 **规则**：18:00 功能冻结
+
+**9/11 完成记录（单人推进）**：
+- [x] `docs/bugs.md` P0 清零
+- [x] `docs/qa-checklist.md` 冻结日回归勾选
+- [x] `docs/api.md` / `ai/quotes.json` / `ai/diary-prompts.json` 冻结
+- [x] `README.md` / `docs/demo-script.md` / `docs/pitch-outline.md`
+- [x] 上传包体修复（`intro.mp4` 压缩）
+- [ ] `pitch/samples/` 标杆图 3 张（待 C 放入）
+- [ ] `pitch/demo.mp4` 录屏（待 D）
+- [ ] `pitch/deck.pptx` 终版 + 排练 2 遍（待 D）
 
 ---
 

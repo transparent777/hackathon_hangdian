@@ -133,7 +133,11 @@ node scripts/check-secrets.js
 |------|------|
 | [PLAN.md](PLAN.md) | 产品定义、分工、倒排日程 |
 | [docs/diary-api.md](docs/diary-api.md) | 陪伴日记接口约定 |
-| [docs/qa-checklist.md](docs/qa-checklist.md) | 功能测试清单 |
+| [docs/qa-checklist.md](docs/qa-checklist.md) | 功能测试清单（9/11 冻结回归） |
+| [docs/bugs.md](docs/bugs.md) | Bug 跟踪 |
+| [docs/api.md](docs/api.md) | 接口说明 |
+| [docs/demo-script.md](docs/demo-script.md) | 30s 录屏脚本 |
+| [docs/pitch-outline.md](docs/pitch-outline.md) | 答辩 PPT 大纲 |
 | [docs/素材库.md](docs/素材库.md) | 本地素材同步说明 |
 | [server/README.md](server/README.md) | 后端启动与接口 |
 
