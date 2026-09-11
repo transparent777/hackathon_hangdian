@@ -6,7 +6,7 @@ App({
     // B 联调后改成真实地址，例如 https://your-domain.com/api
     // 开发者工具请用 127.0.0.1（localhost 常连不上）；真机改局域网 IP
     apiBaseUrl: 'http://127.0.0.1:3000/api',
-    // false = 走本地/线上后端真溶图
+    // false = 溶图走真实后端；抽取始终本地随机，无需后端
     useMock: false,
     todayCompanion: null,
     _splashDismissed: false
