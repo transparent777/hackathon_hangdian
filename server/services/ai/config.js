@@ -84,7 +84,7 @@ function loadAiRuntimeConfig() {
     ),
     concurrency: Math.max(1, envInt('AI_MAX_CONCURRENCY', 4)),
     retryMax: Math.max(0, envInt('AI_RETRY_MAX', aiDefaults.blend?.maxRetries ?? 1)),
-    routeBudgetMs: envInt('BLEND_ROUTE_BUDGET_MS', 52000),
+    routeBudgetMs: envInt('BLEND_ROUTE_BUDGET_MS', 120000),
     uploadTtlHours: envInt('UPLOAD_TTL_HOURS', 24),
     healthExposeErrors: envBool('HEALTH_EXPOSE_ERRORS', true),
     isLive: mode === 'live' && Boolean(apiKey),
