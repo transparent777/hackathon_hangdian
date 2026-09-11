@@ -57,8 +57,10 @@ Page({
       sourceType: ['album', 'camera'],
       success: async (res) => {
         try {
-          const stablePath = await ensureStableImagePath(res.tempFiles[0].tempFilePath)
-          this.setData({ imagePath: stablePath })
+          // 直接用临时路径上传，避免 saveFile 后路径在部分环境下 uploadFile 失败
+          const tempPath = res.tempFiles[0].tempFilePath
+          await ensureStableImagePath(tempPath)
+          this.setData({ imagePath: tempPath })
         } catch (error) {
           console.error('persist picked image failed', error)
           wx.showToast({ title: '图片保存失败，请重选', icon: 'none' })
@@ -86,12 +88,8 @@ Page({
       loadingQuote: pickLoadingQuote(characterId)
     })
     try {
-      const stableSourcePath = await ensureStableImagePath(imagePath)
-      if (stableSourcePath !== imagePath) {
-        this.setData({ imagePath: stableSourcePath })
-      }
-
-      const result = await fetchBlend({ characterId, imagePath: stableSourcePath, rarity })
+      const result = await fetchBlend({ characterId, imagePath, rarity })
+      const stableSourcePath = imagePath
       let displayImageUrl = result.resultUrl
 
       try {
@@ -125,8 +123,12 @@ Page({
       })
     } catch (error) {
       const message = error?.message || '溶图失败，请重试'
-      wx.showToast({ title: message.slice(0, 20), icon: 'none' })
-      console.error(error)
+      console.error('[onBlend]', error)
+      wx.showModal({
+        title: '溶图失败',
+        content: message,
+        showCancel: false
+      })
     } finally {
       this.setData({ blending: false })
     }

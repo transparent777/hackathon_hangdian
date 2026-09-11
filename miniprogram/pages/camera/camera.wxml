@@ -25,7 +25,7 @@
         variant="primary"
         text="拍照 / 从相册选择"
         icon="photograph"
-        catch:tap="chooseImage"
+        bind:tap="chooseImage"
       />
       <action-pill
         variant="secondary"
@@ -33,7 +33,7 @@
         loading-text="溶图中..."
         disabled="{{!imagePath || blending}}"
         loading="{{blending}}"
-        catch:tap="onBlend"
+        bind:tap="onBlend"
       />
     </view>
   </view>
