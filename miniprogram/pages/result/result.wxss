@@ -20,14 +20,14 @@
 
 .character-sticker {
   position: absolute;
-  right: 24rpx;
-  bottom: 24rpx;
-  width: 220rpx;
-  height: 220rpx;
-  border: var(--border-sketch);
-  border-radius: 24rpx;
+  right: 16rpx;
+  bottom: 16rpx;
+  width: 96rpx;
+  height: 96rpx;
+  border: 3rpx solid #2d3436;
+  border-radius: 12rpx;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 2rpx 4rpx 0 rgba(45, 52, 54, 0.12);
 }
 
 .polaroid-caption {
