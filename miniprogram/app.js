@@ -1,4 +1,5 @@
 const { prepareSplashVideo } = require('./utils/splash-video')
+const { loadVantIconFont } = require('./utils/load-vant-icon')
 
 App({
   globalData: {
@@ -13,6 +14,8 @@ App({
   onLaunch() {
     // 仅冷启动重置：本次打开小程序只播一次开场动画
     this.globalData._splashDismissed = false
+
+    loadVantIconFont()
 
     prepareSplashVideo().catch((error) => {
       console.warn('[app] preload splash video failed', error)

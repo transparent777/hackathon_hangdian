@@ -2,6 +2,7 @@ const { fetchBlend } = require('../../utils/api')
 const { getCharacterById } = require('../../utils/characters')
 const { addHistory } = require('../../utils/history')
 const { ensureStableImagePath } = require('../../utils/image-path')
+const { pickLoadingQuote } = require('../../utils/loading-quotes')
 
 Page({
   data: {
@@ -10,7 +11,8 @@ Page({
     characterImage: '',
     rarity: '普通',
     imagePath: '',
-    blending: false
+    blending: false,
+    loadingQuote: ''
   },
 
   onLoad(options) {
@@ -76,7 +78,10 @@ Page({
       return
     }
 
-    this.setData({ blending: true })
+    this.setData({
+      blending: true,
+      loadingQuote: pickLoadingQuote(characterId)
+    })
     try {
       const stableSourcePath = await ensureStableImagePath(imagePath)
       if (stableSourcePath !== imagePath) {
