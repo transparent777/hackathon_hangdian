@@ -40,11 +40,17 @@
 
   <van-overlay show="{{blending}}" z-index="100">
     <view class="overlay-panel">
-      <view class="overlay-card">
-        <image class="overlay-avatar" src="{{characterImage}}" mode="aspectFill" />
-        <van-loading size="28px" color="#6C5CE7" vertical>
-          {{characterName}} 正在走向你的生活...
-        </van-loading>
+      <view class="loading-chat card">
+        <view class="loading-chat__row">
+          <image class="loading-chat__avatar" src="{{characterImage}}" mode="aspectFill" />
+          <view class="loading-chat__bubble loading-chat__bubble--{{characterId}}">
+            <text class="loading-chat__quote">「{{loadingQuote}}」</text>
+          </view>
+        </view>
+        <view class="loading-chat__footer">
+          <van-loading size="20px" color="#6C5CE7" />
+          <text class="loading-chat__hint">{{characterName}} 正在溶进你的生活…</text>
+        </view>
       </view>
     </view>
   </van-overlay>

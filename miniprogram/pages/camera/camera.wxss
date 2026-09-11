@@ -56,21 +56,122 @@
   padding: 48rpx;
 }
 
-.overlay-card {
+/* 趣味 Loading：微信式聊天气泡 */
+.loading-chat {
   width: 100%;
-  max-width: 560rpx;
-  background: #fff;
-  border: var(--border-sketch);
-  border-radius: var(--radius-card);
-  padding: 48rpx 32rpx;
-  text-align: center;
+  max-width: 620rpx;
+  padding: 36rpx 28rpx;
+  background: #fffef8;
   box-shadow: var(--shadow-lift);
 }
 
-.overlay-avatar {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 50%;
-  border: var(--border-sketch);
-  margin: 0 auto 32rpx;
+.loading-chat__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+}
+
+.loading-chat__avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 12rpx;
+  border: 3rpx solid #2d3436;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.loading-chat__bubble {
+  position: relative;
+  max-width: calc(100% - 100rpx);
+  padding: 20rpx 24rpx;
+  border: 3rpx solid #2d3436;
+  border-radius: 4rpx 20rpx 20rpx 20rpx;
+  line-height: 1.7;
+}
+
+.loading-chat__bubble::before {
+  content: '';
+  position: absolute;
+  left: -14rpx;
+  top: 24rpx;
+  width: 0;
+  height: 0;
+  border-top: 10rpx solid transparent;
+  border-bottom: 10rpx solid transparent;
+  border-right: 14rpx solid #2d3436;
+}
+
+.loading-chat__bubble::after {
+  content: '';
+  position: absolute;
+  left: -9rpx;
+  top: 26rpx;
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-right: 12rpx solid #fffef8;
+}
+
+.loading-chat__bubble--naiwa {
+  background: rgba(255, 234, 200, 0.55);
+}
+
+.loading-chat__bubble--naiwa::after {
+  border-right-color: #fff3dc;
+}
+
+.loading-chat__bubble--naiwa .loading-chat__quote {
+  color: #e17055;
+  font-family: 'STXingkai', 'KaiTi', serif;
+}
+
+.loading-chat__bubble--doro {
+  background: rgba(162, 155, 254, 0.15);
+  border-radius: 20rpx 4rpx 20rpx 20rpx;
+}
+
+.loading-chat__bubble--doro::after {
+  border-right-color: #f0edff;
+}
+
+.loading-chat__bubble--doro .loading-chat__quote {
+  color: #6c5ce7;
+  font-family: 'Songti SC', 'STSong', serif;
+}
+
+.loading-chat__bubble--maodie {
+  background: rgba(116, 185, 255, 0.15);
+  transform: rotate(-0.6deg);
+}
+
+.loading-chat__bubble--maodie::after {
+  border-right-color: #edf6ff;
+}
+
+.loading-chat__bubble--maodie .loading-chat__quote {
+  color: #0984e3;
+  font-family: 'PingFang SC', sans-serif;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.loading-chat__quote {
+  font-size: 28rpx;
+  letter-spacing: 1rpx;
+}
+
+.loading-chat__footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin-top: 32rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx dashed rgba(45, 52, 54, 0.15);
+}
+
+.loading-chat__hint {
+  font-size: 24rpx;
+  color: var(--color-muted);
 }

@@ -8,26 +8,27 @@
       <view class="profile-card__sub">陪伴相机 · 体验版</view>
     </view>
 
+    <view class="feature-list">
+      <view
+        class="feature-card card {{item.page ? 'feature-card--active' : ''}}"
+        wx:for="{{featureItems}}"
+        wx:key="title"
+        data-page="{{item.page}}"
+        bind:tap="onFeatureTap"
+      >
+        <view class="feature-card__head">
+          <van-icon name="{{item.icon}}" size="24px" color="#6C5CE7" />
+          <view class="feature-card__title">{{item.title}}</view>
+        </view>
+        <view class="feature-card__desc">{{item.desc}}</view>
+      </view>
+    </view>
+
     <view class="section-label">玩法说明</view>
     <view class="info-card card">
       <view class="info-item" wx:for="{{guides}}" wx:key="title">
         <view class="info-item__title">{{item.title}}</view>
         <view class="info-item__desc">{{item.desc}}</view>
-      </view>
-    </view>
-
-    <view class="section-label">加分项</view>
-    <view class="bonus-grid">
-      <view
-        class="bonus-card card {{item.page ? 'bonus-card--active' : ''}}"
-        wx:for="{{bonusItems}}"
-        wx:key="title"
-        data-page="{{item.page}}"
-        bind:tap="onBonusTap"
-      >
-        <van-icon name="{{item.icon}}" size="24px" color="#6C5CE7" />
-        <view class="bonus-card__title">{{item.title}}</view>
-        <view class="bonus-card__status {{item.page ? 'bonus-card__status--ready' : ''}}">{{item.status}}</view>
       </view>
     </view>
 

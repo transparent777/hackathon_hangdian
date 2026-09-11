@@ -31,27 +31,11 @@
                 mode="aspectFit"
               />
             </view>
-            <view class="polaroid__caption">{{item.characterName}}</view>
           </view>
 
           <view class="entry-meta">
             <image class="entry-meta__avatar" src="{{item.characterImage}}" mode="aspectFill" />
-            <view class="entry-meta__info">
-              <view class="entry-meta__name">{{item.characterName}}</view>
-              <van-tag
-                wx:if="{{item.rarity === '传说'}}"
-                color="#FF6B6B"
-                text-color="#FFFFFF"
-                size="medium"
-              >{{item.rarity}}</van-tag>
-              <van-tag
-                wx:elif="{{item.rarity === '稀有'}}"
-                color="#6C5CE7"
-                text-color="#FFFFFF"
-                size="medium"
-              >{{item.rarity}}</van-tag>
-              <van-tag wx:else color="#74B9FF" text-color="#FFFFFF" size="medium">{{item.rarity}}</van-tag>
-            </view>
+            <view class="entry-meta__name name--{{item.fontStyle}}">{{item.characterName}}</view>
           </view>
 
           <view class="entry-note {{item.noteClass}}" wx:if="{{item.hasNote}}">

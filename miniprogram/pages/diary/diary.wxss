@@ -75,7 +75,8 @@
   background: #fff;
   border: var(--border-sketch);
   box-shadow: var(--shadow-soft);
-  padding: 32rpx 14rpx 52rpx;
+  /* 上粗 44 / 左右细 14 / 下粗 56 */
+  padding: 44rpx 14rpx 56rpx;
 }
 
 .polaroid__photo-wrap {
@@ -103,15 +104,6 @@
   box-shadow: var(--shadow-soft);
 }
 
-.polaroid__caption {
-  margin-top: 20rpx;
-  text-align: center;
-  font-size: 28rpx;
-  font-weight: 700;
-  color: var(--color-ink);
-  letter-spacing: 2rpx;
-}
-
 .entry-meta {
   display: flex;
   align-items: center;
@@ -126,15 +118,26 @@
   border: 2rpx solid #2d3436;
 }
 
-.entry-meta__info {
-  display: flex;
-  align-items: center;
-  gap: 12rpx;
-}
-
 .entry-meta__name {
   font-size: 28rpx;
   font-weight: 700;
+}
+
+.name--naiwa {
+  color: #e17055;
+  font-family: 'STXingkai', 'KaiTi', serif;
+}
+
+.name--doro {
+  color: #6c5ce7;
+  font-family: 'Songti SC', 'STSong', 'SimSun', serif;
+}
+
+.name--maodie {
+  color: #0984e3;
+  font-family: 'PingFang SC', sans-serif;
+  font-style: italic;
+  font-weight: 800;
 }
 
 .entry-note {
@@ -158,10 +161,14 @@
   display: block;
 }
 
+/* 奶蛙 · 橙色 · 行书 */
 .note--naiwa {
   border: 2rpx dashed #e17055;
+  background: rgba(255, 234, 200, 0.4);
+  font-family: 'STXingkai', 'KaiTi', 'STKaiti', serif;
   font-size: 28rpx;
-  letter-spacing: 1rpx;
+  letter-spacing: 2rpx;
+  color: #e17055;
   transform: rotate(-0.5deg);
 }
 
@@ -169,55 +176,72 @@
   font-size: 30rpx;
   font-weight: 600;
   border-style: solid;
+  color: #d35400;
   box-shadow: 0 8rpx 0 rgba(225, 112, 85, 0.15);
 }
 
 .note--naiwa.note--legendary {
   font-size: 32rpx;
   font-weight: 700;
+  color: #e67e22;
   border: 3rpx solid #f39c12;
+  background: rgba(255, 243, 205, 0.55);
   box-shadow: 0 12rpx 0 rgba(243, 156, 18, 0.2);
 }
 
+/* doro · 紫色 · 宋体 */
 .note--doro {
-  border: 2rpx solid #fd79a8;
-  border-radius: 24rpx;
+  border: 2rpx solid #a29bfe;
+  border-radius: 20rpx;
+  background: rgba(162, 155, 254, 0.12);
+  font-family: 'Songti SC', 'STSong', 'SimSun', serif;
   font-size: 26rpx;
+  letter-spacing: 3rpx;
   color: #6c5ce7;
-  letter-spacing: 2rpx;
 }
 
 .note--doro.note--rare {
   font-size: 28rpx;
   border-width: 3rpx;
+  border-color: #6c5ce7;
+  color: #5f4dd6;
 }
 
 .note--doro.note--legendary {
   font-size: 30rpx;
-  border-color: #e84393;
-  box-shadow: 0 8rpx 24rpx rgba(232, 67, 147, 0.15);
+  border-color: #5f27cd;
+  color: #4a3fb8;
+  background: rgba(108, 92, 231, 0.15);
+  box-shadow: 0 8rpx 24rpx rgba(108, 92, 231, 0.15);
 }
 
+/* 耄耋 · 蓝色 · 狂野潦草（非行楷） */
 .note--maodie {
-  border-left: 6rpx solid #e17055;
+  border-left: 6rpx solid #0984e3;
+  background: rgba(116, 185, 255, 0.1);
+  font-family: 'PingFang SC', 'Helvetica Neue', sans-serif;
   font-size: 28rpx;
   font-style: italic;
-  transform: rotate(0.8deg);
-  color: #2d3436;
+  font-weight: 800;
+  letter-spacing: 0.5rpx;
+  transform: rotate(1deg) skewX(-2deg);
+  color: #0984e3;
 }
 
 .note--maodie.note--rare {
   font-size: 30rpx;
-  font-weight: 600;
   border-left-width: 8rpx;
-  border-left-color: #d63031;
+  border-left-color: #0652dd;
+  color: #0652dd;
 }
 
 .note--maodie.note--legendary {
   font-size: 32rpx;
-  font-weight: 700;
-  border-left: 8rpx solid #b71540;
-  box-shadow: 4rpx 4rpx 0 rgba(45, 52, 54, 0.1);
+  font-weight: 900;
+  border-left: 8rpx solid #1e3799;
+  color: #1e3799;
+  background: rgba(9, 132, 227, 0.14);
+  box-shadow: 4rpx 4rpx 0 rgba(9, 132, 227, 0.12);
 }
 
 .diary-end {
