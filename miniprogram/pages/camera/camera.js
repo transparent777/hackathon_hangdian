@@ -38,13 +38,20 @@ Page({
   },
 
   async validateImagePath(imagePath) {
+    const { fileExists } = require('../../utils/image-path')
     try {
-      await ensureStableImagePath(imagePath)
+      await fileExists(imagePath)
     } catch (error) {
       console.warn('stored image invalid', error)
       this.setData({ imagePath: '' })
       wx.showToast({ title: '原图已失效，请重新选图', icon: 'none' })
     }
+  },
+
+  onPreviewImageError() {
+    console.warn('preview image load failed', this.data.imagePath)
+    this.setData({ imagePath: '' })
+    wx.showToast({ title: '图片无法预览，请重选', icon: 'none' })
   },
 
   chooseImage() {
@@ -55,16 +62,24 @@ Page({
       count: 1,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: async (res) => {
-        try {
-          // 直接用临时路径上传，避免 saveFile 后路径在部分环境下 uploadFile 失败
-          const tempPath = res.tempFiles[0].tempFilePath
-          await ensureStableImagePath(tempPath)
-          this.setData({ imagePath: tempPath })
-        } catch (error) {
-          console.error('persist picked image failed', error)
-          wx.showToast({ title: '图片保存失败，请重选', icon: 'none' })
+      success: (res) => {
+        const tempPath = res.tempFiles[0]?.tempFilePath
+        if (!tempPath) {
+          wx.showToast({ title: '未获取到图片路径', icon: 'none' })
+          return
         }
+        // 先展示临时路径，避免 saveFile 阻塞导致白屏
+        this.setData({ imagePath: tempPath })
+        // 后台持久化：成功则静默换成稳定路径，供切页/再拍一张使用
+        ensureStableImagePath(tempPath)
+          .then((stablePath) => {
+            if (stablePath && stablePath !== tempPath && this.data.imagePath === tempPath) {
+              this.setData({ imagePath: stablePath })
+            }
+          })
+          .catch((error) => {
+            console.warn('background persist skipped', error)
+          })
       },
       fail: (err) => {
         if (err.errMsg && err.errMsg.includes('cancel')) return
@@ -88,8 +103,18 @@ Page({
       loadingQuote: pickLoadingQuote(characterId)
     })
     try {
-      const result = await fetchBlend({ characterId, imagePath, rarity })
-      const stableSourcePath = imagePath
+      let uploadPath = imagePath
+      try {
+        uploadPath = await ensureStableImagePath(imagePath)
+        if (uploadPath !== imagePath) {
+          this.setData({ imagePath: uploadPath })
+        }
+      } catch (pathError) {
+        console.warn('use current image path for upload', pathError)
+      }
+
+      const result = await fetchBlend({ characterId, imagePath: uploadPath, rarity })
+      const stableSourcePath = uploadPath
       let displayImageUrl = result.resultUrl
 
       try {

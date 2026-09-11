@@ -16,11 +16,11 @@ function persistImagePath(tempPath) {
   })
 }
 
-function accessFile(path) {
+function fileExists(filePath) {
   return new Promise((resolve, reject) => {
-    wx.getFileSystemManager().access({
-      path,
-      success: resolve,
+    wx.getFileSystemManager().getFileInfo({
+      filePath,
+      success: () => resolve(true),
       fail: reject
     })
   })
@@ -56,19 +56,25 @@ async function ensureStableImagePath(filePath) {
     return downloadRemoteImage(filePath)
   }
 
-  if (!isTempImagePath(filePath)) {
-    await accessFile(filePath)
-    return filePath
+  if (isTempImagePath(filePath)) {
+    try {
+      const savedPath = await persistImagePath(filePath)
+      await fileExists(savedPath)
+      return savedPath
+    } catch (error) {
+      // 部分环境下 saveFile 失败，临时路径仍可用于本次预览/上传
+      await fileExists(filePath)
+      return filePath
+    }
   }
 
-  const savedPath = await persistImagePath(filePath)
-  await accessFile(savedPath)
-  return savedPath
+  await fileExists(filePath)
+  return filePath
 }
 
 module.exports = {
   isTempImagePath,
   persistImagePath,
   ensureStableImagePath,
-  accessFile
+  fileExists
 }

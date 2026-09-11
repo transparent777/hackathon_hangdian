@@ -11,7 +11,12 @@
     </view>
 
     <view class="preview card card--tilt-right" wx:if="{{imagePath}}">
-      <image class="preview-image" src="{{imagePath}}" mode="aspectFill" />
+      <image
+        class="preview-image"
+        src="{{imagePath}}"
+        mode="aspectFill"
+        binderror="onPreviewImageError"
+      />
       <image class="sticker-preview" src="{{characterImage}}" mode="aspectFit" />
     </view>
 
