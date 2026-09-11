@@ -8,14 +8,7 @@ Page({
         title: '陪伴日记',
         desc: '溶图后以手账形式回看 AI 批注',
         icon: 'notes-o',
-        status: '已上线',
         page: '/pages/diary/diary'
-      },
-      {
-        title: '趣味 Loading',
-        desc: '溶图等待时，陪伴兽会像聊天一样发来一句名言',
-        icon: 'comment-o',
-        status: '已上线'
       }
     ],
     guides: [

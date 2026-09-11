@@ -19,7 +19,6 @@
         <view class="feature-card__head">
           <van-icon name="{{item.icon}}" size="24px" color="#6C5CE7" />
           <view class="feature-card__title">{{item.title}}</view>
-          <view class="feature-card__status feature-card__status--ready">{{item.status}}</view>
         </view>
         <view class="feature-card__desc">{{item.desc}}</view>
       </view>

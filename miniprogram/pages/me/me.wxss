@@ -57,16 +57,6 @@
   font-weight: 700;
 }
 
-.feature-card__status {
-  font-size: 22rpx;
-  color: var(--color-muted);
-}
-
-.feature-card__status--ready {
-  color: var(--color-primary);
-  font-weight: 700;
-}
-
 .feature-card__desc {
   margin-top: 12rpx;
   font-size: 24rpx;
