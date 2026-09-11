@@ -1,7 +1,6 @@
 {
   "navigationBarTitleText": "陪伴日记",
   "usingComponents": {
-    "van-icon": "@vant/weapp/icon/index",
-    "van-tag": "@vant/weapp/tag/index"
+    "van-icon": "@vant/weapp/icon/index"
   }
 }
