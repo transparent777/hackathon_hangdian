@@ -39,9 +39,11 @@ diaryNote + fontStyle → 返回小程序
 `server/.env`：
 
 ```env
-AI_MODE=mock          # mock | live
-AI_API_KEY=           # live 时必填，勿提交
-AI_API_BASE_URL=      # 厂商 OpenAI 兼容地址（可选）
+AI_MODE=live
+AI_API_KEY=你的火山方舟_API_Key
+AI_API_BASE_URL=https://ark.cn-beijing.volces.com
+AI_BLEND_MODEL=doubao-seedream-4-5-251128
+PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-`AI_MODE=live` 且配置了 Key 后，在 `server/services/ai/providers/http.js` 内实现真实 HTTP 调用。
+溶图已接入 `server/services/ai/providers/http.js`（Seedream 图生图）。日记批注多模态仍用 fallback，后续可接方舟视觉对话模型。

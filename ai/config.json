@@ -14,9 +14,10 @@
       "description": "不回传真实溶图，原图作 resultUrl，日记用 fallback"
     },
     "http": {
-      "description": "OpenAI 兼容或自建网关；在 providers/http.js 实现",
-      "blendEndpoint": "/v1/images/edits",
-      "diaryEndpoint": "/v1/chat/completions"
+      "description": "火山方舟 Seedream；在 providers/http.js 实现",
+      "blendEndpoint": "/api/v3/images/generations",
+      "defaultBaseUrl": "https://ark.cn-beijing.volces.com",
+      "defaultBlendModel": "doubao-seedream-4-5-251128"
     }
   }
 }

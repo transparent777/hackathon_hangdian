@@ -1,7 +1,10 @@
+const path = require('path')
 const { loadAiRuntimeConfig } = require('./config')
 const { buildBlendPromptText, resolveReferenceImagePath, loadBlendPrompt } = require('./prompts')
 const { getProvider } = require('./providers')
 const mockProvider = require('./providers/mock')
+
+const UPLOAD_DIR = path.join(__dirname, '../../uploads')
 
 async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl }) {
   const config = loadAiRuntimeConfig()
@@ -22,7 +25,9 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl })
     strength: blendCfg.blend?.strength,
     referenceImagePath,
     sourceImagePath: sourceFile.path,
-    publicResultPath
+    publicResultPath,
+    publicBaseUrl,
+    uploadDir: UPLOAD_DIR
   }
 
   try {
