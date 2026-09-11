@@ -1,17 +1,15 @@
 {
-  "_readme": "奶蛙溶图 prompt。仅配置与文案，不含 API Key。",
   "characterId": "naiwa",
   "name": "奶蛙",
   "referenceImage": "references/naiwa.jpg",
   "blend": {
-    "prompt": "Integrate a cute chibi milk-yellow pear-shaped meme creature (naiwa, big eyes, simple mouth, absurd smile) naturally into the user's real-life photo. Match lighting and perspective. Meme style, semi-realistic composite, no watermark.",
-    "negativePrompt": "blurry, distorted face, extra limbs, text, logo, watermark, horror",
-    "strength": 0.65,
-    "styleTags": ["meme", "chibi", "cute", "absurd"]
+    "prompt": "将奶黄色梨形、大眼一字嘴的抽象狂笑生物「奶蛙」自然融入用户真实生活照片中，保持场景光线与透视一致，半写实合成，无水印无文字。",
+    "negativePrompt": "变形, 低质量, 水印, 文字",
+    "strength": 0.65
   },
   "rarityModifiers": {
-    "普通": "Small scale, subtle at scene edge, casual presence.",
-    "稀有": "More visible, soft warm accent, playful pose.",
-    "传说": "Hero presence, cinematic lighting, memorable composition."
+    "普通": "角色较小，融入背景一角",
+    "稀有": "角色更清晰，与场景有互动",
+    "传说": "角色成为画面焦点，光影戏剧感"
   }
 }

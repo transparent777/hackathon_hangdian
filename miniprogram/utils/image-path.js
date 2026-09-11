@@ -26,9 +26,34 @@ function accessFile(path) {
   })
 }
 
+function normalizeLocalApiUrl(url) {
+  return String(url || '').replace('http://localhost:', 'http://127.0.0.1:')
+}
+
+function downloadRemoteImage(url) {
+  const targetUrl = normalizeLocalApiUrl(url)
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url: targetUrl,
+      success: (res) => {
+        if (res.statusCode !== 200) {
+          reject(new Error('download image failed'))
+          return
+        }
+        persistImagePath(res.tempFilePath).then(resolve).catch(reject)
+      },
+      fail: reject
+    })
+  })
+}
+
 async function ensureStableImagePath(filePath) {
   if (!filePath) {
     throw new Error('image path is empty')
+  }
+
+  if (/^https?:\/\//i.test(filePath)) {
+    return downloadRemoteImage(filePath)
   }
 
   if (!isTempImagePath(filePath)) {

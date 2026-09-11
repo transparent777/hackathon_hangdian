@@ -19,11 +19,14 @@ Page({
     const rarity = decodeURIComponent(options.rarity || '普通')
     const character = getCharacterById(options.characterId || 'naiwa', rarity)
     const imagePath = options.imagePath ? decodeURIComponent(options.imagePath) : ''
+    const rawCharacterImage = options.image ? decodeURIComponent(options.image) : ''
+    const characterImage =
+      rawCharacterImage && rawCharacterImage !== 'undefined' ? rawCharacterImage : character.image
 
     this.setData({
       characterId: character.characterId,
       characterName: decodeURIComponent(options.name || '') || character.name,
-      characterImage: decodeURIComponent(options.image || '') || character.image,
+      characterImage,
       rarity: character.rarity || rarity,
       imagePath,
       blending: false
@@ -89,20 +92,27 @@ Page({
       }
 
       const result = await fetchBlend({ characterId, imagePath: stableSourcePath, rarity })
-      const historyItem = await addHistory({
-        characterId,
-        characterName,
-        characterImage,
-        rarity,
-        imageUrl: result.resultUrl,
-        sourceImagePath: stableSourcePath,
-        quote: result.companionText,
-        diaryNote: result.diaryNote || '',
-        fontStyle: result.fontStyle || characterId
-      })
+      let displayImageUrl = result.resultUrl
+
+      try {
+        const historyItem = await addHistory({
+          characterId,
+          characterName,
+          characterImage,
+          rarity,
+          imageUrl: result.resultUrl,
+          sourceImagePath: stableSourcePath,
+          quote: result.companionText,
+          diaryNote: result.diaryNote || '',
+          fontStyle: result.fontStyle || characterId
+        })
+        displayImageUrl = historyItem.imageUrl
+      } catch (historyError) {
+        console.warn('save history failed, still show result', historyError)
+      }
 
       const query = [
-        `imageUrl=${encodeURIComponent(historyItem.imageUrl)}`,
+        `imageUrl=${encodeURIComponent(displayImageUrl)}`,
         `quote=${encodeURIComponent(result.companionText)}`,
         `name=${encodeURIComponent(characterName)}`,
         `characterId=${characterId}`,
@@ -114,7 +124,8 @@ Page({
         url: `/pages/result/result?${query}`
       })
     } catch (error) {
-      wx.showToast({ title: '溶图失败，请重试', icon: 'none' })
+      const message = error?.message || '溶图失败，请重试'
+      wx.showToast({ title: message.slice(0, 20), icon: 'none' })
       console.error(error)
     } finally {
       this.setData({ blending: false })

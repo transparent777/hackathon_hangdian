@@ -1,5 +1,13 @@
-const { rollCharacter } = require('./characters')
+const { rollCharacter, getCharacterById } = require('./characters')
 const { mockBlend } = require('./mock')
+
+function enrichRollResult(data) {
+  const base = getCharacterById(data.characterId, data.rarity || '普通')
+  return {
+    ...base,
+    quote: data.quote || base.quote
+  }
+}
 
 function getAppConfig() {
   const app = getApp()
@@ -45,6 +53,7 @@ function uploadBlend({ characterId, imagePath, openid, rarity }) {
       url: `${apiBaseUrl}/blend`,
       filePath: imagePath,
       name: 'image',
+      timeout: 180000,
       formData: {
         characterId,
         openid: openid || '',
@@ -61,9 +70,24 @@ function uploadBlend({ characterId, imagePath, openid, rarity }) {
             return
           }
         }
-        reject(new Error('溶图失败'))
+        let message = '溶图失败'
+        try {
+          const errData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+          message = errData?.message || message
+        } catch (error) {
+          // ignore parse error
+        }
+        reject(new Error(message))
       },
-      fail: reject
+      fail: (error) => {
+        const hint = String(error?.errMsg || error?.message || '')
+        console.error('[uploadBlend] fail', apiBaseUrl, hint)
+        if (hint.includes('timeout')) {
+          reject(new Error('溶图超时，请稍后重试'))
+          return
+        }
+        reject(new Error('无法连接后端，请确认 server 已启动'))
+      }
     })
   })
 }
@@ -74,7 +98,7 @@ async function fetchRoll() {
     return Promise.resolve(rollCharacter())
   }
   const data = await request({ url: '/roll', method: 'POST', data: {} })
-  return data
+  return enrichRollResult(data)
 }
 
 async function fetchBlend({ characterId, imagePath, openid, rarity }) {

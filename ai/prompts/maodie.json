@@ -1,17 +1,15 @@
 {
-  "_readme": "耄耋溶图 prompt。仅配置与文案，不含 API Key。",
   "characterId": "maodie",
   "name": "耄耋",
   "referenceImage": "references/maodie.jpg",
   "blend": {
-    "prompt": "Integrate maodie (fluffy round orange cat meme, lazy boss cat vibe, meme style) naturally into the user's real-life photo. Match perspective and shadows. Semi-realistic composite.",
-    "negativePrompt": "blurry, aggressive realism, extra limbs, text, watermark",
-    "strength": 0.68,
-    "styleTags": ["meme", "cat", "fluffy", "lazy"]
+    "prompt": "将圆头橘猫、飞机耳、野性难驯的「耄耋」自然融入用户真实生活照片中，保持场景光线与透视一致，半写实合成，无水印无文字。",
+    "negativePrompt": "变形, 低质量, 水印, 文字",
+    "strength": 0.65
   },
   "rarityModifiers": {
-    "普通": "Lounging at desk or sofa edge, small territorial vibe.",
-    "稀有": "More prominent, proud pose, warm afternoon light.",
-    "传说": "Dominant composition, dramatic but funny, guardian presence."
+    "普通": "猫较小，像视察领地般蹲在边缘",
+    "稀有": "猫与桌面或家具形成互动",
+    "传说": "猫成为画面主角，威严又慵懒"
   }
 }

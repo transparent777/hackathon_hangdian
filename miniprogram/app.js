@@ -4,9 +4,10 @@ const { loadVantIconFont } = require('./utils/load-vant-icon')
 App({
   globalData: {
     // B 联调后改成真实地址，例如 https://your-domain.com/api
-    apiBaseUrl: 'http://localhost:3000/api',
-    // true = mock 全流程；B 就绪后改 false 并配置合法域名
-    useMock: true,
+    // 开发者工具请用 127.0.0.1（localhost 常连不上）；真机改局域网 IP
+    apiBaseUrl: 'http://127.0.0.1:3000/api',
+    // false = 走本地/线上后端真溶图
+    useMock: false,
     todayCompanion: null,
     _splashDismissed: false
   },
