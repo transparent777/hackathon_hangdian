@@ -1,0 +1,15 @@
+{
+  "characterId": "maodie",
+  "name": "耄耋",
+  "referenceImage": "references/maodie.jpg",
+  "blend": {
+    "prompt": "将圆头橘猫、飞机耳、野性难驯的「耄耋」自然融入用户真实生活照片中，保持场景光线与透视一致，半写实合成，无水印无文字。",
+    "negativePrompt": "变形, 低质量, 水印, 文字",
+    "strength": 0.65
+  },
+  "rarityModifiers": {
+    "普通": "猫较小，像视察领地般蹲在边缘",
+    "稀有": "猫与桌面或家具形成互动",
+    "传说": "猫成为画面主角，威严又慵懒"
+  }
+}

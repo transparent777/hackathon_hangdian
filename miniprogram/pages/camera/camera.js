@@ -19,11 +19,14 @@ Page({
     const rarity = decodeURIComponent(options.rarity || '普通')
     const character = getCharacterById(options.characterId || 'naiwa', rarity)
     const imagePath = options.imagePath ? decodeURIComponent(options.imagePath) : ''
+    const rawCharacterImage = options.image ? decodeURIComponent(options.image) : ''
+    const characterImage =
+      rawCharacterImage && rawCharacterImage !== 'undefined' ? rawCharacterImage : character.image
 
     this.setData({
       characterId: character.characterId,
       characterName: decodeURIComponent(options.name || '') || character.name,
-      characterImage: decodeURIComponent(options.image || '') || character.image,
+      characterImage,
       rarity: character.rarity || rarity,
       imagePath,
       blending: false
@@ -35,13 +38,20 @@ Page({
   },
 
   async validateImagePath(imagePath) {
+    const { fileExists } = require('../../utils/image-path')
     try {
-      await ensureStableImagePath(imagePath)
+      await fileExists(imagePath)
     } catch (error) {
       console.warn('stored image invalid', error)
       this.setData({ imagePath: '' })
       wx.showToast({ title: '原图已失效，请重新选图', icon: 'none' })
     }
+  },
+
+  onPreviewImageError() {
+    console.warn('preview image load failed', this.data.imagePath)
+    this.setData({ imagePath: '' })
+    wx.showToast({ title: '图片无法预览，请重选', icon: 'none' })
   },
 
   chooseImage() {
@@ -52,14 +62,24 @@ Page({
       count: 1,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
-      success: async (res) => {
-        try {
-          const stablePath = await ensureStableImagePath(res.tempFiles[0].tempFilePath)
-          this.setData({ imagePath: stablePath })
-        } catch (error) {
-          console.error('persist picked image failed', error)
-          wx.showToast({ title: '图片保存失败，请重选', icon: 'none' })
+      success: (res) => {
+        const tempPath = res.tempFiles[0]?.tempFilePath
+        if (!tempPath) {
+          wx.showToast({ title: '未获取到图片路径', icon: 'none' })
+          return
         }
+        // 先展示临时路径，避免 saveFile 阻塞导致白屏
+        this.setData({ imagePath: tempPath })
+        // 后台持久化：成功则静默换成稳定路径，供切页/再拍一张使用
+        ensureStableImagePath(tempPath)
+          .then((stablePath) => {
+            if (stablePath && stablePath !== tempPath && this.data.imagePath === tempPath) {
+              this.setData({ imagePath: stablePath })
+            }
+          })
+          .catch((error) => {
+            console.warn('background persist skipped', error)
+          })
       },
       fail: (err) => {
         if (err.errMsg && err.errMsg.includes('cancel')) return
@@ -83,26 +103,40 @@ Page({
       loadingQuote: pickLoadingQuote(characterId)
     })
     try {
-      const stableSourcePath = await ensureStableImagePath(imagePath)
-      if (stableSourcePath !== imagePath) {
-        this.setData({ imagePath: stableSourcePath })
+      let uploadPath = imagePath
+      try {
+        uploadPath = await ensureStableImagePath(imagePath)
+        if (uploadPath !== imagePath) {
+          this.setData({ imagePath: uploadPath })
+        }
+      } catch (pathError) {
+        console.warn('use current image path for upload', pathError)
       }
 
-      const result = await fetchBlend({ characterId, imagePath: stableSourcePath, rarity })
-      const historyItem = await addHistory({
-        characterId,
-        characterName,
-        characterImage,
-        rarity,
-        imageUrl: result.resultUrl,
-        sourceImagePath: stableSourcePath,
-        quote: result.companionText,
-        diaryNote: result.diaryNote || '',
-        fontStyle: result.fontStyle || characterId
-      })
+      const result = await fetchBlend({ characterId, imagePath: uploadPath, rarity })
+      console.log('[blend] diary', result.diaryProvider || 'unknown', result.diaryNote?.slice(0, 40))
+      const stableSourcePath = uploadPath
+      let displayImageUrl = result.resultUrl
+
+      try {
+        const historyItem = await addHistory({
+          characterId,
+          characterName,
+          characterImage,
+          rarity,
+          imageUrl: result.resultUrl,
+          sourceImagePath: stableSourcePath,
+          quote: result.companionText,
+          diaryNote: result.diaryNote || '',
+          fontStyle: result.fontStyle || characterId
+        })
+        displayImageUrl = historyItem.imageUrl
+      } catch (historyError) {
+        console.warn('save history failed, still show result', historyError)
+      }
 
       const query = [
-        `imageUrl=${encodeURIComponent(historyItem.imageUrl)}`,
+        `imageUrl=${encodeURIComponent(displayImageUrl)}`,
         `quote=${encodeURIComponent(result.companionText)}`,
         `name=${encodeURIComponent(characterName)}`,
         `characterId=${characterId}`,
@@ -114,8 +148,13 @@ Page({
         url: `/pages/result/result?${query}`
       })
     } catch (error) {
-      wx.showToast({ title: '溶图失败，请重试', icon: 'none' })
-      console.error(error)
+      const message = error?.message || '溶图失败，请重试'
+      console.error('[onBlend]', error)
+      wx.showModal({
+        title: '溶图失败',
+        content: message,
+        showCancel: false
+      })
     } finally {
       this.setData({ blending: false })
     }

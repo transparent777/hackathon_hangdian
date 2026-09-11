@@ -73,7 +73,7 @@ openid       string    可选
 
 | 交付项 | 文件/位置 | 说明 |
 |--------|-----------|------|
-| 溶图 prompt | `ai/prompts/naiwa.json` 等 | **待创建**，三角色各一份，给 B 调 API |
+| 溶图 prompt | `ai/prompts/naiwa.json` 等 | **已搭骨架（占位）**，联调时调优 |
 | 日记 prompt | `ai/diary-prompts.json` | **已完成并冻结**，9/11 后仅改错别字 |
 | 角色参考图 | `ai/references/` | 三角色参考，确保无隐私 |
 | 标杆样图 ×3 | `pitch/samples/` | 答辩 PPT 第 5 页，命名见 `pitch/README.md` |
@@ -89,7 +89,7 @@ openid       string    可选
 
 **日记批注**：B 溶图成功后调多模态，读 `ai/diary-prompts.json` 中对应角色 + 稀有度 prompt，输入**溶图结果图**。
 
-**阻塞 B 的事项**：`ai/prompts/` 未就绪 / 溶图 API 未通。
+**阻塞 B 的事项**：`providers/http.js` 真实溶图 API 未实现 / 参考图未放入 `ai/references/`。
 
 ---
 

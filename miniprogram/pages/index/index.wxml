@@ -45,7 +45,12 @@
         <view class="panel__label">今日陪伴兽</view>
         <block wx:if="{{companion}}">
           <view class="companion-portrait" style="box-shadow: 0 8rpx 0 {{companion.accent}};">
-            <image class="companion-portrait__img" src="{{companion.image}}" mode="aspectFill" />
+            <image
+              class="companion-portrait__img"
+              src="{{companion.image}}"
+              mode="aspectFill"
+              binderror="onCompanionImageError"
+            />
           </view>
           <van-tag color="{{companion.rarityColor}}" custom-class="rarity-tag">{{companion.rarity}}</van-tag>
           <view class="companion-name">{{companion.name}}</view>

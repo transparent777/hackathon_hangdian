@@ -65,12 +65,22 @@ Page({
     this.setData({ bannerSrc: '' })
   },
 
+  onCompanionImageError() {
+    const { companion } = this.data
+    if (!companion?.characterId) return
+    const fixed = normalizeCompanion(companion)
+    if (fixed.image && fixed.image !== companion.image) {
+      this.setData({ companion: fixed })
+    }
+  },
+
   async onRoll() {
     if (this.data.rolling) return
 
     this.setData({ rolling: true })
     try {
-      const companion = await fetchRoll()
+      const rolled = await fetchRoll()
+      const companion = normalizeCompanion(rolled)
       const app = getApp()
       app.globalData.todayCompanion = companion
       setTodayCompanion(companion)

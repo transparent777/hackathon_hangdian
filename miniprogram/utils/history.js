@@ -13,7 +13,17 @@ function getHistory() {
 }
 
 async function addHistory(record) {
-  const savedImagePath = await ensureStableImagePath(record.imageUrl)
+  let imageUrl = record.imageUrl
+  try {
+    imageUrl = await ensureStableImagePath(record.imageUrl)
+  } catch (error) {
+    if (/^https?:\/\//i.test(record.imageUrl)) {
+      console.warn('keep remote result url for history', error)
+      imageUrl = record.imageUrl
+    } else {
+      throw error
+    }
+  }
 
   const item = {
     id: `${Date.now()}`,
@@ -21,7 +31,7 @@ async function addHistory(record) {
     characterName: record.characterName,
     characterImage: record.characterImage,
     rarity: record.rarity || '普通',
-    imageUrl: savedImagePath,
+    imageUrl,
     sourceImagePath: record.sourceImagePath || '',
     quote: record.quote,
     diaryNote: record.diaryNote || '',

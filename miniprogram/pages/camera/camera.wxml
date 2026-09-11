@@ -11,7 +11,12 @@
     </view>
 
     <view class="preview card card--tilt-right" wx:if="{{imagePath}}">
-      <image class="preview-image" src="{{imagePath}}" mode="aspectFill" />
+      <image
+        class="preview-image"
+        src="{{imagePath}}"
+        mode="aspectFill"
+        binderror="onPreviewImageError"
+      />
       <image class="sticker-preview" src="{{characterImage}}" mode="aspectFit" />
     </view>
 
@@ -25,7 +30,7 @@
         variant="primary"
         text="拍照 / 从相册选择"
         icon="photograph"
-        catch:tap="chooseImage"
+        bind:tap="chooseImage"
       />
       <action-pill
         variant="secondary"
@@ -33,7 +38,7 @@
         loading-text="溶图中..."
         disabled="{{!imagePath || blending}}"
         loading="{{blending}}"
-        catch:tap="onBlend"
+        bind:tap="onBlend"
       />
     </view>
   </view>

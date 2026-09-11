@@ -161,6 +161,14 @@
   display: block;
 }
 
+.entry-note--empty {
+  border: 2rpx dashed #dfe6e9;
+  background: rgba(255, 255, 255, 0.35);
+  color: #95a5a6;
+  font-size: 24rpx;
+  padding-left: 24rpx;
+}
+
 /* 奶蛙 · 橙色 · 行书 */
 .note--naiwa {
   border: 2rpx dashed #e17055;

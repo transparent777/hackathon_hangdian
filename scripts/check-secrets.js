@@ -21,13 +21,13 @@ const IGNORE_DIRS = new Set([
 ])
 
 const IGNORE_FILES = new Set([
-  '.env.example',
   'check-secrets.js',
   'project.private.config.json.example',
   'security.md'
 ])
 
 const RULES = [
+  { name: '火山方舟 Ark API Key', pattern: /\bark-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-[0-9a-f]{4,}\b/i },
   { name: 'OpenAI / 通用 API Key', pattern: /\bsk-[A-Za-z0-9]{20,}\b/ },
   { name: '阿里云 DashScope', pattern: /\bsk-[a-f0-9]{32}\b/i },
   { name: '硬编码 apiKey', pattern: /api[_-]?key\s*[:=]\s*['"][^'"]{8,}['"]/i },
@@ -74,7 +74,11 @@ function getFiles(stagedOnly) {
     'miniprogram/project.config.json',
     'miniprogram/app.js',
     'server/index.js',
-    'ai/diary-prompts.json'
+    'server/services/ai/config.js',
+    'server/services/ai/providers/http.js',
+    'server/.env.example',
+    'ai/diary-prompts.json',
+    'ai/prompts/naiwa.json'
   ]
   return targets
     .map((f) => path.join(ROOT, f))
