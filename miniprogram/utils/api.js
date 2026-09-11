@@ -1,13 +1,5 @@
-const { rollCharacter, getCharacterById } = require('./characters')
+const { rollCharacter } = require('./characters')
 const { mockBlend } = require('./mock')
-
-function enrichRollResult(data) {
-  const base = getCharacterById(data.characterId, data.rarity || '普通')
-  return {
-    ...base,
-    quote: data.quote || base.quote
-  }
-}
 
 function getAppConfig() {
   const app = getApp()
@@ -132,13 +124,9 @@ function uploadBlend({ characterId, imagePath, openid, rarity }) {
   )
 }
 
-async function fetchRoll() {
-  const { useMock } = getAppConfig()
-  if (useMock) {
-    return Promise.resolve(rollCharacter())
-  }
-  const data = await request({ url: '/roll', method: 'POST', data: {} })
-  return enrichRollResult(data)
+// 抽取陪伴兽：纯本地随机，不依赖后端
+function fetchRoll() {
+  return Promise.resolve(rollCharacter())
 }
 
 async function fetchBlend({ characterId, imagePath, openid, rarity }) {
