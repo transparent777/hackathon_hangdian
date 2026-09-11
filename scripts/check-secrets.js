@@ -74,7 +74,10 @@ function getFiles(stagedOnly) {
     'miniprogram/project.config.json',
     'miniprogram/app.js',
     'server/index.js',
-    'ai/diary-prompts.json'
+    'server/services/ai/config.js',
+    'server/services/ai/providers/http.js',
+    'ai/diary-prompts.json',
+    'ai/prompts/naiwa.json'
   ]
   return targets
     .map((f) => path.join(ROOT, f))

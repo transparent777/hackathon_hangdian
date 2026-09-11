@@ -1,0 +1,17 @@
+{
+  "_readme": "耄耋溶图 prompt。仅配置与文案，不含 API Key。",
+  "characterId": "maodie",
+  "name": "耄耋",
+  "referenceImage": "references/maodie.jpg",
+  "blend": {
+    "prompt": "Integrate maodie (fluffy round orange cat meme, lazy boss cat vibe, meme style) naturally into the user's real-life photo. Match perspective and shadows. Semi-realistic composite.",
+    "negativePrompt": "blurry, aggressive realism, extra limbs, text, watermark",
+    "strength": 0.68,
+    "styleTags": ["meme", "cat", "fluffy", "lazy"]
+  },
+  "rarityModifiers": {
+    "普通": "Lounging at desk or sofa edge, small territorial vibe.",
+    "稀有": "More prominent, proud pose, warm afternoon light.",
+    "传说": "Dominant composition, dramatic but funny, guardian presence."
+  }
+}

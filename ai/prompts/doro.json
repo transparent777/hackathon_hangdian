@@ -1,0 +1,17 @@
+{
+  "_readme": "doro 溶图 prompt。仅配置与文案，不含 API Key。",
+  "characterId": "doro",
+  "name": "doro",
+  "referenceImage": "references/doro.jpg",
+  "blend": {
+    "prompt": "Integrate doro (simple orange-pink round meme creature, blank cute eyes, chubby, meme style) naturally into the user's real-life photo. Match scene lighting. Cozy, soft, semi-realistic blend.",
+    "negativePrompt": "blurry, scary, extra limbs, text, watermark, realistic human",
+    "strength": 0.62,
+    "styleTags": ["meme", "cute", "soft", "orange"]
+  },
+  "rarityModifiers": {
+    "普通": "Lying or sitting quietly at corner, small and mellow.",
+    "稀有": "Slightly larger, gentle orange glow, relaxed pose.",
+    "传说": "Warm focal point, dreamy atmosphere, orange accent light."
+  }
+}
