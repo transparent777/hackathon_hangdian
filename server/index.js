@@ -93,8 +93,11 @@ app.post('/api/blend', (req, res) => {
       const promptBundle = getDiaryPromptBundle(characterId, rarity)
       let diaryResult = {
         diaryNote: getFallbackDiaryNote(characterId, rarityKey),
-        fontStyle: promptBundle.fontStyle
+        fontStyle: promptBundle.fontStyle,
+        provider: 'fallback'
       }
+
+      const diaryTimeoutMs = Number(process.env.AI_DIARY_TIMEOUT_MS) || 45000
 
       try {
         diaryResult = await Promise.race([
@@ -104,18 +107,21 @@ app.post('/api/blend', (req, res) => {
             imagePath: blendResult.localPath || file.path
           }),
           new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('diary timeout')), 20000)
+            setTimeout(() => reject(new Error('diary timeout')), diaryTimeoutMs)
           })
         ])
       } catch (diaryError) {
         console.warn('[blend] diary skipped:', diaryError.message)
       }
 
+      console.log('[blend] diary provider:', diaryResult.provider || 'fallback')
+
       res.json({
         resultUrl: blendResult.resultUrl,
         companionText: pickQuote(characterId),
         diaryNote: diaryResult.diaryNote,
         fontStyle: diaryResult.fontStyle,
+        diaryProvider: diaryResult.provider || 'fallback',
         taskId: `blend-${Date.now()}`
       })
     } catch (err) {

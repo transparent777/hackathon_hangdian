@@ -26,7 +26,7 @@ async function runDiary({ characterId, rarityLabel, imagePath }) {
     return {
       diaryNote: result.diaryNote || fallbackText,
       fontStyle: promptBundle.fontStyle,
-      provider: result.provider || (config.isDiaryLive ? 'deepseek' : 'mock')
+      provider: result.provider || (config.isDiaryLive ? 'deepseek-flash' : 'mock')
     }
   } catch (error) {
     if (config.isDiaryLive) {

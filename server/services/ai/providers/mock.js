@@ -10,9 +10,11 @@ async function blendImage({ sourceImagePath, publicResultPath }) {
   }
 }
 
-async function generateDiaryNote({ fallbackText }) {
+const { getFallbackDiaryNote } = require('../fallbacks')
+
+async function generateDiaryNote({ characterId, rarityKey, fallbackText }) {
   return {
-    diaryNote: fallbackText,
+    diaryNote: getFallbackDiaryNote(characterId, rarityKey) || fallbackText,
     provider: 'mock'
   }
 }

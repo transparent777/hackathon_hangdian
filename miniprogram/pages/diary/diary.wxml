@@ -42,6 +42,9 @@
             <text class="entry-note__mark">✎</text>
             <text class="entry-note__text">{{item.diaryNote}}</text>
           </view>
+          <view class="entry-note entry-note--empty" wx:else>
+            <text class="entry-note__text">暂无 AI 批注，重新溶图后会根据画面生成</text>
+          </view>
         </view>
       </view>
 

@@ -23,6 +23,27 @@ function buildDiaryMessages(promptBundle) {
   return { system, userText: characterPrompt }
 }
 
+function extractAssistantContent(message) {
+  if (!message) return ''
+
+  const content = message.content
+  if (typeof content === 'string') {
+    return content.trim()
+  }
+
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === 'string') return part
+        return part?.text || ''
+      })
+      .join('')
+      .trim()
+  }
+
+  return ''
+}
+
 function sanitizeDiaryText(text, maxLength) {
   let s = String(text || '').trim()
   s = s.replace(/^["'「『]+|["'」』]+$/g, '')
@@ -73,7 +94,7 @@ async function callDeepSeekVision(config, { system, userText, imageDataUri }) {
       throw new Error(`DeepSeek 请求失败: ${message}`)
     }
 
-    const content = payload.choices?.[0]?.message?.content
+    const content = extractAssistantContent(payload.choices?.[0]?.message)
     if (!content) {
       throw new Error('DeepSeek 未返回日记批注')
     }
@@ -97,13 +118,25 @@ async function generateDiaryNote(ctx) {
   }
 
   const { system, userText } = buildDiaryMessages(promptBundle)
-  const raw = await callDeepSeekVision(config, { system, userText, imageDataUri })
-  const diaryNote = sanitizeDiaryText(raw, promptBundle.maxLength)
+  let lastError = null
 
-  return {
-    diaryNote: diaryNote || fallbackText,
-    provider: 'deepseek-flash'
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      const raw = await callDeepSeekVision(config, { system, userText, imageDataUri })
+      const diaryNote = sanitizeDiaryText(raw, promptBundle.maxLength)
+      if (diaryNote && diaryNote.length >= 4) {
+        return {
+          diaryNote,
+          provider: 'deepseek-flash'
+        }
+      }
+      lastError = new Error('DeepSeek 返回批注过短')
+    } catch (error) {
+      lastError = error
+    }
   }
+
+  throw lastError || new Error('DeepSeek 未返回日记批注')
 }
 
 module.exports = {

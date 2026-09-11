@@ -114,6 +114,7 @@ Page({
       }
 
       const result = await fetchBlend({ characterId, imagePath: uploadPath, rarity })
+      console.log('[blend] diary', result.diaryProvider || 'unknown', result.diaryNote?.slice(0, 40))
       const stableSourcePath = uploadPath
       let displayImageUrl = result.resultUrl
 
