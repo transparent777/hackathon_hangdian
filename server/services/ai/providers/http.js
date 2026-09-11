@@ -1,13 +1,19 @@
 /**
- * 火山方舟 · 豆包 Seedream 溶图（live）
+ * 火山方舟 · 豆包 Seedream 5.0 溶图（live）
  * 文档：https://www.volcengine.com/docs/82379
+ *
+ * 模型 ID（须写全）：
+ * - Lite: doubao-seedream-5-0-260128
+ * - Pro:  doubao-seedream-5-0-pro-260628
  */
-const path = require('path')
 const fs = require('fs')
 const { fileToDataUri, downloadImageToDir } = require('../image-utils')
+const { resolveBlendSize } = require('../config')
 
 const DEFAULT_ARK_BASE = 'https://ark.cn-beijing.volces.com'
-const DEFAULT_BLEND_MODEL = 'doubao-seedream-4-5-251128'
+const DEFAULT_BLEND_MODEL = 'doubao-seedream-5-0-260128'
+
+const PRO_MODEL_ID = 'doubao-seedream-5-0-pro-260628'
 
 class AiProviderNotImplementedError extends Error {
   constructor(feature) {
@@ -41,6 +47,27 @@ function collectReferenceImages(sourceImagePath, referenceImagePath) {
   }
 
   return images
+}
+
+function buildSeedreamBody({ model, prompt, images }) {
+  const body = {
+    model,
+    prompt,
+    size: resolveBlendSize(model),
+    response_format: 'url',
+    stream: false,
+    watermark: process.env.AI_BLEND_WATERMARK !== 'false'
+  }
+
+  // Pro 不支持组图；Lite / 4.x 关闭组图
+  if (model !== PRO_MODEL_ID) {
+    body.sequential_image_generation = 'disabled'
+  }
+
+  // 图生图 / 多图融合：单张 string，多张 array
+  body.image = images.length === 1 ? images[0] : images
+
+  return body
 }
 
 async function callSeedreamGeneration(config, body) {
@@ -98,18 +125,12 @@ async function blendImage(ctx) {
     throw new Error('缺少用户原图，无法溶图')
   }
 
-  const body = {
-    model: config.blendModel || DEFAULT_BLEND_MODEL,
+  const model = config.blendModel || DEFAULT_BLEND_MODEL
+  const body = buildSeedreamBody({
+    model,
     prompt: buildBlendPrompt(promptText),
-    size: process.env.AI_BLEND_SIZE || '2K',
-    sequential_image_generation: 'disabled',
-    response_format: 'url',
-    stream: false,
-    watermark: process.env.AI_BLEND_WATERMARK !== 'false'
-  }
-
-  // 图生图：单张用 image，多张用 image 数组（用户场景 + 角色参考）
-  body.image = images.length === 1 ? images[0] : images
+    images
+  })
 
   const remoteUrl = await callSeedreamGeneration(config, body)
 
@@ -118,9 +139,10 @@ async function blendImage(ctx) {
 
   return {
     resultUrl,
-    provider: 'volcengine-seedream',
+    provider: 'volcengine-seedream-5',
     blended: true,
-    remoteUrl
+    remoteUrl,
+    model
   }
 }
 
@@ -131,7 +153,6 @@ async function generateDiaryNote(ctx) {
     throw new Error('AI_API_KEY 未配置')
   }
 
-  // 日记批注需多模态对话模型，与 Seedream 分离；暂用 fallback
   console.warn('[ai/http] diary 多模态未接入，使用 fallback 文案')
   return {
     diaryNote: fallbackText,

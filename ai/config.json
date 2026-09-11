@@ -9,15 +9,37 @@
     "timeoutMs": 45000,
     "maxRetries": 1
   },
+  "seedream": {
+    "models": {
+      "lite": {
+        "id": "doubao-seedream-5-0-260128",
+        "label": "Seedream 5.0 Lite",
+        "sizes": ["2K", "3K", "4K"],
+        "notes": "支持组图；溶图默认推荐"
+      },
+      "pro": {
+        "id": "doubao-seedream-5-0-pro-260628",
+        "label": "Seedream 5.0 Pro",
+        "sizes": ["1K", "2K"],
+        "notes": "画质更好；多图融合 2~10 张；不支持组图"
+      },
+      "4.5": {
+        "id": "doubao-seedream-4-5-251128",
+        "label": "Seedream 4.5（旧）",
+        "sizes": ["2K", "4K"],
+        "notes": "兼容保留"
+      }
+    },
+    "defaultVariant": "lite"
+  },
   "providers": {
     "mock": {
       "description": "不回传真实溶图，原图作 resultUrl，日记用 fallback"
     },
     "http": {
-      "description": "火山方舟 Seedream；在 providers/http.js 实现",
+      "description": "火山方舟 Seedream 5.0；在 providers/http.js 实现",
       "blendEndpoint": "/api/v3/images/generations",
-      "defaultBaseUrl": "https://ark.cn-beijing.volces.com",
-      "defaultBlendModel": "doubao-seedream-4-5-251128"
+      "defaultBaseUrl": "https://ark.cn-beijing.volces.com"
     }
   }
 }

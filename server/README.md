@@ -23,17 +23,25 @@ server/services/ai/        运行时：blend + diary + providers
 | `AI_MODE` | 行为 |
 |-----------|------|
 | `mock` | 溶图回传原图 URL，日记用 fallback 文案 |
-| `live` | 火山方舟 Seedream 4.5 溶图（`providers/http.js`） |
+| `live` | 火山方舟 Seedream 5.0 溶图（`providers/http.js`） |
 
-**火山方舟 `.env` 示例**（Key 自行填入，勿提交）：
+**火山方舟 Seedream 5.0 `.env` 示例**（Key 自行填入，勿提交）：
 
 ```env
 AI_MODE=live
 AI_API_KEY=你的密钥
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
-AI_BLEND_MODEL=doubao-seedream-4-5-251128
+AI_BLEND_VARIANT=lite
+# AI_BLEND_VARIANT=pro
+# AI_BLEND_MODEL=doubao-seedream-5-0-pro-260628
+AI_BLEND_SIZE=2K
 PUBLIC_BASE_URL=http://localhost:3000
 ```
+
+| `AI_BLEND_VARIANT` | 模型 |
+|--------------------|------|
+| `lite`（默认） | `doubao-seedream-5-0-260128` |
+| `pro` | `doubao-seedream-5-0-pro-260628` |
 
 详见 `ai/README.md`。接入真实 API 时只改 `providers/http.js`，**密钥勿写进代码**。
 
