@@ -3,7 +3,6 @@
     <view class="polaroid card card--tilt-left">
       <view class="photo-frame">
         <image class="bg-photo" src="{{imageUrl}}" mode="aspectFill" />
-        <image class="character-sticker" src="{{characterImage}}" mode="aspectFit" />
       </view>
       <view class="polaroid-caption">
         <view class="caption-name">{{characterName}}</view>

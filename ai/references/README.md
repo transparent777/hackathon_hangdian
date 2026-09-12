@@ -22,13 +22,11 @@ variants/
 
 清单见 `manifest.json`（含每张图是否为主参考图 `isPrimary`）。
 
-源文件维护在本地 `素材库/溶图/`（**不进 Git**），运行：
+源文件维护在本地 `素材库/溶图/`，运行：
 
 ```bash
 python scripts/sync_blend_assets.py
 ```
-
-本目录下的 `*.jpg`、`variants/`、`manifest.json` 均为本地生成，已在 `.gitignore` 中忽略；仓库只提交本 README。
 
 ## 选主参考图
 
