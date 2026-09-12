@@ -30,7 +30,7 @@
 |----|------|
 | 小程序 | 微信原生 + [Vant Weapp](https://github.com/youzan/vant-weapp) |
 | 后端 | Node.js + Express（`server/`） |
-| AI | 溶图 API + 多模态日记批注（`ai/diary-prompts.json`） |
+| AI | 多模态场景分析 + 透明角色确定性合成 + 多模态日记批注 |
 | 存储 | 本地 `wx.storage`（历史）；后端 `uploads/`（联调） |
 
 当前默认 **Mock 模式**

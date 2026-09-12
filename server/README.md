@@ -14,7 +14,7 @@ npm start
 ## AI 架构（原 C 职责）
 
 ```
-ai/prompts/*.json          溶图 prompt（占位英文，联调时改）
+ai/prompts/*.json          角色身份约束、透明动作候选和旧溶图 prompt
 ai/diary-prompts.json      日记多模态 prompt（已冻结）
 ai/quotes.json             陪伴语池
 server/services/ai/        运行时：blend + diary + providers
@@ -22,15 +22,16 @@ server/services/ai/        运行时：blend + diary + providers
 
 | `AI_MODE` | 行为 |
 |-----------|------|
-| `mock` | 溶图回传原图 URL，日记用 fallback 文案 |
-| `live` | 溶图走火山方舟 Seedream 5.0；日记走 DeepSeek 多模态（各自 Key） |
+| `mock` | 使用默认动作和位置完成本地素材合成；日记用 fallback 文案 |
+| `live` | Seedream Pro 生成并直接返回场景互动候选图；日记走 DeepSeek 多模态 |
 
 **`.env` 示例**（Key 自行填入，勿提交）：
 
 ```env
 AI_MODE=live
+AI_BLEND_STRATEGY=seedream-full
 
-# 溶图 · 火山方舟
+# Seedream 候选图生成配置
 AI_API_KEY=你的火山方舟密钥
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
 AI_BLEND_VARIANT=pro
@@ -44,12 +45,15 @@ AI_DIARY_MODEL=deepseek-flash
 PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-| `AI_BLEND_VARIANT` | 溶图模型 |
-|--------------------|------|
-| `pro`（默认） | `doubao-seedream-5-0-pro-260628` |
-| `lite` | `doubao-seedream-5-0-260128` |
+`hybrid` 模式需要 `AI_API_KEY`、Python、Pillow、NumPy、ONNX Runtime 和 `models/u2netp.onnx`。Seedream 成功但角色提取失败时默认保留完整 AI 候选图；候选图生成失败时才返回透明动作素材。两种降级都会通过 `degraded`、`failedStage`、`fallbackKind` 和 `fallbackReason` 明确标记；设置 `AI_ALLOW_ASSET_FALLBACK=false` 可改为直接返回错误。
 
-溶图：`providers/http.js` · 日记：`providers/deepseek.js`。**密钥勿写进代码**。
+| `AI_BLEND_STRATEGY` | 行为 |
+|---------------------|------|
+| `seedream-full`（默认） | 直接返回 Seedream 完整候选图；角色融合最好，背景可能被轻微重绘 |
+| `hybrid` | Seedream Pro 生成互动候选；U2Net-P 本地分割，Sharp 恢复原始背景 |
+| `asset-composite` | DeepSeek 选择透明动作素材，Sharp 直接合成，不生成新动作 |
+
+Seedream 候选图：`providers/http.js` · 本地分割：`segmenter.js` / `scripts/segment_foreground.py` · 背景恢复与合成：`compositor.js` · 场景分析/日记：`providers/deepseek.js`。**密钥勿写进代码**。
 
 ## 安全
 

@@ -21,8 +21,10 @@
 server/services/ai/blend.js  ──读──► ai/prompts/{id}.json
         │
         ▼
-providers/mock.js     AI_MODE=mock（默认，回传原图 URL）
-providers/http.js     AI_MODE=live + AI_API_KEY（火山方舟 Seedream 溶图）
+providers/http.js     Seedream Pro 生成一次场景互动候选图
+segmenter.js          U2Net-P 本地生成角色前景蒙版
+compositor.js         提取候选图中的角色，覆盖回原始照片并校验背景像素
+scene.js              asset-composite 回退时选择透明动作、落脚点和比例
         │
         ▼
 溶图结果图 URL
@@ -47,7 +49,7 @@ AI_API_KEY=你的火山方舟_API_Key
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
 
 # 二选一：variant 快捷切换，或直接写完整 model id
-AI_BLEND_VARIANT=pro           # pro | lite | 4.5（溶图方案 A 需 pro）
+AI_BLEND_VARIANT=pro           # pro | lite | 4.5
 # AI_BLEND_MODEL=doubao-seedream-5-0-pro-260628
 
 AI_BLEND_SIZE=2K               # lite: 2K/3K/4K；pro: 1K/2K
@@ -61,8 +63,8 @@ PUBLIC_BASE_URL=http://localhost:3000
 
 | variant | 模型 ID | 说明 |
 |---------|---------|------|
-| `pro`（默认） | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，单图交互编辑溶图 |
-| `lite` | `doubao-seedream-5-0-260128` | 5.0 Lite，不支持方案 A |
+| `pro`（hybrid 固定） | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，候选图生成 |
+| `lite` | `doubao-seedream-5-0-260128` | 5.0 Lite，组图候选生成 |
 | `4.5` | `doubao-seedream-4-5-251128` | 旧版兼容 |
 
 溶图：`providers/http.js` · 日记：`providers/deepseek.js`。

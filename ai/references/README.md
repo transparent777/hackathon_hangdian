@@ -4,11 +4,11 @@
 
 | 文件 | 角色 | 说明 |
 |------|------|------|
-| `naiwa.jpg` | 奶蛙 | 溶图时作为「角色外观唯一依据」传给 API |
+| `naiwa.jpg` | 奶蛙 | 角色原始形象参考 |
 | `doro.jpg` | doro | 同上 |
 | `maodie.jpg` | 耄耋 | 同上 |
 
-`ai/prompts/*.json` 的 `referenceImage` 指向上述文件，供撰写 prompt 时对照角色外观；**方案 A 溶图不会把参考图上传给 Seedream**，角色外观由 `blend.prompt` 文字描述。
+默认 `hybrid` 流程将 `referenceImage` 与用户场景一并交给 Seedream Pro 生成候选图，再通过本地 U2Net-P 分割将候选角色覆盖回原始背景。`composition.variants` 用于 `asset-composite` 策略，以及候选生成、分割或合成失败时的安全回退。
 
 ## 扩展素材库
 

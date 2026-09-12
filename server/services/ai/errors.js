@@ -40,6 +40,20 @@ class AIExtractError extends AIError {
   }
 }
 
+class AIStageError extends AIError {
+  constructor(stage, error) {
+    const cause = error instanceof Error ? error : new Error(String(error))
+    super(cause.message || `AI 阶段失败：${stage}`, {
+      kind: cause.kind || 'stage',
+      code: cause.code || 'AI_STAGE_FAILED',
+      status: cause.status || null,
+      retriable: Boolean(cause.retriable),
+      cause
+    })
+    this.stage = stage
+  }
+}
+
 function isNetworkError(error) {
   if (!error) return false
   if (error.name === 'TypeError') return true
@@ -54,6 +68,7 @@ function describe(error) {
     kind: err.kind,
     code: err.code,
     status: err.status,
+    stage: err.stage || null,
     retriable: err.retriable,
     message: err.message
   }
@@ -65,6 +80,7 @@ module.exports = {
   AIProviderError,
   AITimeoutError,
   AIExtractError,
+  AIStageError,
   AISemaphoreTimeout,
   isNetworkError,
   describe

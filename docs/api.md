@@ -42,6 +42,12 @@
 ```json
 {
   "resultUrl": "https://...",
+  "blended": true,
+  "blendProvider": "seedream-extract-composite",
+  "backgroundPreserved": true,
+  "degraded": false,
+  "failedStage": null,
+  "fallbackReason": null,
   "companionText": "今天在窗边陪你晒太阳",
   "diaryNote": "阳光落在书页上…",
   "fontStyle": "naiwa",
@@ -49,9 +55,11 @@
 }
 ```
 
+`hybrid` 模式只调用一次 Seedream Pro 生成互动候选图，再由本地 U2Net-P 分割角色并覆盖回原始照片。`backgroundPreserved=true` 表示区域外像素已通过完整性检查。AI 阶段失败且允许基础兜底时，`degraded=true`，`failedStage` 会区分 `candidate_generation`、`foreground_segmentation` 和 `background_composite`；小程序必须向用户显示该降级状态。
+
 ## 健康检查
 
-`GET /` 未实现；可用 `POST /roll` 冒烟。
+使用 `GET /health` 查看当前 `blendStrategy`；也可用 `POST /roll` 冒烟。
 
 本地启动：`cd server && npm install && npm start`
 

@@ -114,7 +114,16 @@ Page({
       }
 
       const result = await fetchBlend({ characterId, imagePath: uploadPath, rarity })
-      console.log('[blend] diary', result.diaryProvider || 'unknown', result.diaryNote?.slice(0, 40))
+      console.log('[blend]', result.blendProvider || 'unknown', result.diaryProvider || 'unknown')
+      if (result.degraded) {
+        console.warn('[blend] degraded', result.failedStage, result.fallbackReason)
+        const candidateFallback = result.fallbackKind === 'ai-candidate'
+        wx.showToast({
+          title: candidateFallback ? '角色提取未完成，保留 AI 完整图' : 'AI 动作生成失败，当前为基础合成',
+          icon: 'none',
+          duration: 3000
+        })
+      }
       const stableSourcePath = uploadPath
       let displayImageUrl = result.resultUrl
 
@@ -141,14 +150,25 @@ Page({
         `name=${encodeURIComponent(characterName)}`,
         `characterId=${characterId}`,
         `characterImage=${encodeURIComponent(characterImage)}`,
-        `sourceImagePath=${encodeURIComponent(stableSourcePath)}`
+        `sourceImagePath=${encodeURIComponent(stableSourcePath)}`,
+        `degraded=${result.degraded ? '1' : '0'}`,
+        `failedStage=${encodeURIComponent(result.failedStage || '')}`,
+        `fallbackKind=${encodeURIComponent(result.fallbackKind || '')}`
       ].join('&')
 
       wx.navigateTo({
         url: `/pages/result/result?${query}`
       })
     } catch (error) {
-      const message = error?.message || '溶图失败，请重试'
+      const stageNames = {
+        candidate_generation: 'AI 候选图生成',
+        foreground_segmentation: '角色提取',
+        background_composite: '背景恢复'
+      }
+      const stageName = stageNames[error?.failedStage]
+      const message = stageName
+        ? `${stageName}失败，请重试\n${error?.message || ''}`
+        : error?.message || '溶图失败，请重试'
       console.error('[onBlend]', error)
       wx.showModal({
         title: '溶图失败',

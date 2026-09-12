@@ -1,10 +1,12 @@
 const { createSemaphore } = require('./concurrency')
 const { loadAiRuntimeConfig } = require('./config')
 const { AITimeoutError, describe } = require('./errors')
+const { sanitize } = require('./log')
 
 let semaphore = null
 let semaphoreLimit = 0
 let lastError = null
+let lastBlendError = null
 
 function getSemaphore(limit) {
   if (!semaphore || semaphoreLimit !== limit) {
@@ -19,19 +21,26 @@ function semaphoreStats() {
   return { active: semaphore.active, pending: semaphore.pending, limit: semaphore.limit }
 }
 
-function recordError(error) {
+function recordError(error, scope = 'general') {
   const info = describe(error)
   lastError = {
     code: info.code || info.name,
     kind: info.kind,
     status: info.status,
+    stage: info.stage,
+    message: sanitize(info.message),
     at: Date.now()
   }
+  if (scope === 'blend') lastBlendError = lastError
   return info
 }
 
 function getLastError() {
   return lastError
+}
+
+function getLastBlendError() {
+  return lastBlendError
 }
 
 async function withSlot({ deadline, waitMs = 5000 }, fn) {
@@ -78,6 +87,7 @@ module.exports = {
   withSlot,
   semaphoreStats,
   getLastError,
+  getLastBlendError,
   recordError,
   remainingMs
 }

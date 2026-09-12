@@ -3,7 +3,9 @@
     <view class="polaroid card card--tilt-left">
       <view class="photo-frame">
         <image class="bg-photo" src="{{imageUrl}}" mode="aspectFill" />
+        <view class="blend-status" wx:if="{{degraded}}">{{degradedLabel}}</view>
       </view>
+      <view class="degraded-notice" wx:if="{{degraded}}">{{degradedNotice}}</view>
       <view class="polaroid-caption">
         <view class="caption-name">{{characterName}}</view>
         <view class="caption-quote">「{{quote}}」</view>

@@ -7,6 +7,15 @@ const aiDefaults = readJson(path.join(ROOT, 'ai/config.json')) || {}
 const SEEDREAM_MODELS = aiDefaults.seedream?.models || {}
 
 function resolveBlendModel() {
+  const strategy = (
+    process.env.AI_BLEND_STRATEGY ||
+    aiDefaults.blend?.defaultStrategy ||
+    'seedream-full'
+  ).toLowerCase()
+  if (strategy === 'hybrid') {
+    return SEEDREAM_MODELS.pro?.id || 'doubao-seedream-5-0-pro-260628'
+  }
+
   if (process.env.AI_BLEND_MODEL) {
     return process.env.AI_BLEND_MODEL.trim()
   }
@@ -65,12 +74,17 @@ function loadAiRuntimeConfig() {
     'https://api.deepseek.com'
   ).replace(/\/$/, '')
   const diaryModel = process.env.AI_DIARY_MODEL || aiDefaults.diary?.model || 'deepseek-flash'
+  const blendStrategy = envStr(
+    'AI_BLEND_STRATEGY',
+    aiDefaults.blend?.defaultStrategy || 'seedream-full'
+  ).toLowerCase()
 
   return {
     mode,
     apiKey,
     apiBaseUrl,
     blendModel: resolveBlendModel(),
+    blendStrategy,
     blendVariant: (process.env.AI_BLEND_VARIANT || aiDefaults.seedream?.defaultVariant || 'lite').toLowerCase(),
     blendSize: resolveBlendSize(resolveBlendModel()),
     diaryApiKey,
@@ -87,6 +101,7 @@ function loadAiRuntimeConfig() {
     routeBudgetMs: envInt('BLEND_ROUTE_BUDGET_MS', 120000),
     uploadTtlHours: envInt('UPLOAD_TTL_HOURS', 24),
     healthExposeErrors: envBool('HEALTH_EXPOSE_ERRORS', true),
+    allowAssetFallback: envBool('AI_ALLOW_ASSET_FALLBACK', true),
     isLive: mode === 'live' && Boolean(apiKey),
     isDiaryLive: mode === 'live' && Boolean(diaryApiKey)
   }
@@ -94,7 +109,7 @@ function loadAiRuntimeConfig() {
 
 function describeAiHealth() {
   const { CHARACTER_IDS, getBlendPromptSource } = require('./prompts')
-  const { getLastError, semaphoreStats } = require('./runtime')
+  const { getLastError, getLastBlendError, semaphoreStats } = require('./runtime')
   const config = loadAiRuntimeConfig()
   const stats = semaphoreStats()
   const out = {
@@ -102,6 +117,7 @@ function describeAiHealth() {
     live: config.isLive,
     diaryLive: config.isDiaryLive,
     blendModel: config.blendModel,
+    blendStrategy: config.blendStrategy,
     diaryModel: config.diaryModel,
     concurrency: { limit: config.concurrency, active: stats.active, pending: stats.pending },
     uploadTtlHours: config.uploadTtlHours,
@@ -115,6 +131,7 @@ function describeAiHealth() {
 
   if (config.healthExposeErrors) {
     out.lastError = getLastError()
+    out.lastBlendError = getLastBlendError()
   }
 
   return out
@@ -122,7 +139,7 @@ function describeAiHealth() {
 
 function logAiBootSummary(config) {
   console.log(
-    `[ai] mode=${config.mode} blend=${config.isLive} model=${config.blendModel} size=${config.blendSize} key=${maskSecret(config.apiKey)} | diary=${config.isDiaryLive} model=${config.diaryModel} key=${maskSecret(config.diaryApiKey)}`
+    `[ai] mode=${config.mode} blend=${config.isLive} strategy=${config.blendStrategy} model=${config.blendModel} size=${config.blendSize} key=${maskSecret(config.apiKey)} | diary=${config.isDiaryLive} model=${config.diaryModel} key=${maskSecret(config.diaryApiKey)}`
   )
 }
 

@@ -6,5 +6,19 @@
     "prompt": "在编辑区域添加「doro」桌面小宠物：可爱造型、粗黑描边、扁平色块、放空软糯气质；保持平面梗图画风，不得变成写实动物或 3D 手办。",
     "negativePrompt": "背景修改, 重绘背景, 改变构图, 改变色调, 修改食物, 修改桌面, 白色方块, 画中画, 巨大体型, 3D手办, 写实动物, 改变原貌, 变形, 改变配色, 低质量, 模糊, 水印, 文字",
     "editRegion": { "x": 0.32, "y": 0.58, "w": 0.36, "h": 0.22 }
+  },
+  "composition": {
+    "identityLock": "保持粉色头发、紫色眼睛、白色身体、黑色描边和原始二维梗图画风，不重画角色。",
+    "actionStyle": "软糯、敏感、偶尔兴奋，根据场景选择克制但明确的动作。",
+    "defaultVariant": "01",
+    "defaultAnchor": { "x": 0.5, "y": 0.88 },
+    "defaultScale": 0.25,
+    "variants": [
+      { "id": "01", "file": "variants/doro/01.png", "description": "举手兴奋庆祝", "tags": ["开心", "美食", "庆祝"] },
+      { "id": "02", "file": "variants/doro/02.png", "description": "紧张冒汗站立", "tags": ["尴尬", "紧张", "忙碌"] },
+      { "id": "03", "file": "variants/doro/03.png", "description": "身体倾斜快步行动", "tags": ["赶路", "活力", "探索"] },
+      { "id": "04", "file": "variants/doro/04.png", "description": "双手比心", "tags": ["喜欢", "温暖", "陪伴"] },
+      { "id": "05", "file": "variants/doro/05.png", "description": "趴下休息", "tags": ["休息", "困倦", "放松"] }
+    ]
   }
 }
