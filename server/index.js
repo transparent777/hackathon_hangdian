@@ -130,6 +130,7 @@ app.post('/api/blend', (req, res) => {
         backgroundPreserved: Boolean(blendResult.backgroundPreserved),
         degraded: Boolean(blendResult.degraded),
         failedStage: blendResult.failedStage || null,
+        fallbackKind: blendResult.fallbackKind || null,
         fallbackReason: blendResult.degraded ? blendResult.fallbackReason || 'AI 生成失败' : null,
         companionText: pickQuote(characterId),
         diaryNote: diaryResult.diaryNote,

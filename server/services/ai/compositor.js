@@ -89,6 +89,57 @@ function largestComponent(binary, width, height, focus = null) {
   return focus ? focused || largest : largest
 }
 
+function growComponentFromSeed(binary, width, height, seed) {
+  const queue = new Int32Array(binary.length)
+  let head = 0
+  let tail = 0
+  let minX = width
+  let minY = height
+  let maxX = 0
+  let maxY = 0
+
+  for (const index of seed.pixels) {
+    if (!binary[index]) continue
+    binary[index] = 0
+    queue[tail++] = index
+  }
+
+  while (head < tail) {
+    const index = queue[head++]
+    const x = index % width
+    const y = Math.floor(index / width)
+    minX = Math.min(minX, x)
+    minY = Math.min(minY, y)
+    maxX = Math.max(maxX, x)
+    maxY = Math.max(maxY, y)
+
+    let neighbor
+    if (x > 0 && binary[(neighbor = index - 1)] !== 0) {
+      binary[neighbor] = 0
+      queue[tail++] = neighbor
+    }
+    if (x + 1 < width && binary[(neighbor = index + 1)] !== 0) {
+      binary[neighbor] = 0
+      queue[tail++] = neighbor
+    }
+    if (y > 0 && binary[(neighbor = index - width)] !== 0) {
+      binary[neighbor] = 0
+      queue[tail++] = neighbor
+    }
+    if (y + 1 < height && binary[(neighbor = index + width)] !== 0) {
+      binary[neighbor] = 0
+      queue[tail++] = neighbor
+    }
+  }
+
+  return {
+    size: tail,
+    pixels: queue.slice(0, tail),
+    bounds: { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 },
+    distance: seed.distance
+  }
+}
+
 function borderMean(data, width, height) {
   let total = 0
   let count = 0
@@ -103,7 +154,111 @@ function borderMean(data, width, height) {
   return count ? total / count : 0
 }
 
-async function normalizeGeneratedMask(maskImagePath, width, height, focus = null, allowedBounds = null) {
+function fillSmallEnclosedHoles(component, width, height) {
+  const matte = new Uint8Array(width * height)
+  for (const index of component.pixels) matte[index] = 1
+
+  const visited = new Uint8Array(width * height)
+  const queue = new Int32Array(component.bounds.width * component.bounds.height)
+  const maxHoleSize = Math.max(64, Math.round(component.size * 0.025))
+  let filledHolePixels = 0
+  let largeHolePixels = 0
+
+  for (let y = component.bounds.y; y < component.bounds.y + component.bounds.height; y += 1) {
+    for (let x = component.bounds.x; x < component.bounds.x + component.bounds.width; x += 1) {
+      const start = y * width + x
+      if (matte[start] || visited[start]) continue
+
+      let head = 0
+      let tail = 0
+      let touchesBounds = false
+      visited[start] = 1
+      queue[tail++] = start
+
+      while (head < tail) {
+        const index = queue[head++]
+        const currentX = index % width
+        const currentY = Math.floor(index / width)
+        if (
+          currentX === component.bounds.x ||
+          currentY === component.bounds.y ||
+          currentX === component.bounds.x + component.bounds.width - 1 ||
+          currentY === component.bounds.y + component.bounds.height - 1
+        ) {
+          touchesBounds = true
+        }
+
+        const neighbors = []
+        if (currentX > component.bounds.x) neighbors.push(index - 1)
+        if (currentX + 1 < component.bounds.x + component.bounds.width) neighbors.push(index + 1)
+        if (currentY > component.bounds.y) neighbors.push(index - width)
+        if (currentY + 1 < component.bounds.y + component.bounds.height) neighbors.push(index + width)
+        for (const neighbor of neighbors) {
+          const neighborX = neighbor % width
+          const neighborY = Math.floor(neighbor / width)
+          if (
+            neighborX < component.bounds.x ||
+            neighborY < component.bounds.y ||
+            neighborX >= component.bounds.x + component.bounds.width ||
+            neighborY >= component.bounds.y + component.bounds.height ||
+            matte[neighbor] ||
+            visited[neighbor]
+          ) continue
+          visited[neighbor] = 1
+          queue[tail++] = neighbor
+        }
+      }
+
+      if (touchesBounds) continue
+      if (tail <= maxHoleSize) {
+        for (let i = 0; i < tail; i += 1) matte[queue[i]] = 1
+        filledHolePixels += tail
+      } else {
+        largeHolePixels += tail
+      }
+    }
+  }
+
+  return { matte, filledHolePixels, largeHolePixels }
+}
+
+function validateCharacterComponent(component, repaired, width, height, expectedHeight = null) {
+  const boundsArea = component.bounds.width * component.bounds.height
+  const repairedSize = component.size + repaired.filledHolePixels
+  const occupancy = repairedSize / boundsArea
+  const largeHoleRatio = repaired.largeHolePixels / Math.max(1, component.size)
+
+  if (occupancy < 0.2) {
+    throw new Error(`角色蒙版轮廓过于破碎：完整度 ${(occupancy * 100).toFixed(1)}%`)
+  }
+  if (largeHoleRatio > 0.5) {
+    throw new Error(`角色蒙版存在大面积孔洞：${(largeHoleRatio * 100).toFixed(1)}%`)
+  }
+  if (expectedHeight) {
+    const heightRatio = component.bounds.height / expectedHeight
+    const widthRatio = component.bounds.width / expectedHeight
+    if (heightRatio < 0.7 || heightRatio > 1.75 || widthRatio > 2.1) {
+      throw new Error(
+        `角色蒙版与规划尺寸不符：${component.bounds.width}x${component.bounds.height}`
+      )
+    }
+  }
+
+  return {
+    repairedSize,
+    occupancy,
+    filledHoleRatio: repaired.filledHolePixels / Math.max(1, component.size)
+  }
+}
+
+async function normalizeGeneratedMask(
+  maskImagePath,
+  width,
+  height,
+  focus = null,
+  allowedBounds = null,
+  expectedHeight = null
+) {
   const raw = await sharp(maskImagePath)
     .rotate()
     .resize(width, height, { fit: 'fill' })
@@ -111,17 +266,23 @@ async function normalizeGeneratedMask(maskImagePath, width, height, focus = null
     .raw()
     .toBuffer()
   const invert = borderMean(raw, width, height) > 127
-  const binary = new Uint8Array(raw.length)
+  const strong = new Uint8Array(raw.length)
+  const weak = new Uint8Array(raw.length)
   for (let i = 0; i < raw.length; i += 1) {
     const value = invert ? 255 - raw[i] : raw[i]
     const x = i % width
     const y = Math.floor(i / width)
-    binary[i] = value >= 160 && (!allowedBounds || inBounds(x, y, allowedBounds)) ? 1 : 0
+    const allowed = !allowedBounds || inBounds(x, y, allowedBounds)
+    strong[i] = value >= 160 && allowed ? 1 : 0
+    weak[i] = value >= 32 && allowed ? 1 : 0
   }
 
-  const component = largestComponent(binary, width, height, focus)
-  if (!component) throw new Error('角色蒙版中没有可用前景')
-  const ratio = component.size / (width * height)
+  const seed = largestComponent(strong, width, height, focus)
+  if (!seed) throw new Error('角色蒙版中没有可用前景')
+  const component = growComponentFromSeed(weak, width, height, seed)
+  const repaired = fillSmallEnclosedHoles(component, width, height)
+  const quality = validateCharacterComponent(component, repaired, width, height, expectedHeight)
+  const ratio = quality.repairedSize / (width * height)
   if (ratio < 0.005 || ratio > 0.5) {
     throw new Error(`角色蒙版面积异常：${(ratio * 100).toFixed(1)}%`)
   }
@@ -130,7 +291,9 @@ async function normalizeGeneratedMask(maskImagePath, width, height, focus = null
   }
 
   const matte = Buffer.alloc(width * height)
-  for (const index of component.pixels) matte[index] = 255
+  for (let i = 0; i < repaired.matte.length; i += 1) {
+    if (repaired.matte[i]) matte[i] = 255
+  }
   const softened = await sharp(matte, { raw: { width, height, channels: 1 } })
     .dilate(1)
     .blur(0.8)
@@ -151,7 +314,9 @@ async function normalizeGeneratedMask(maskImagePath, width, height, focus = null
     buffer,
     bounds,
     foregroundRatio: ratio,
-    inverted: invert
+    inverted: invert,
+    maskOccupancy: quality.occupancy,
+    filledHoleRatio: quality.filledHoleRatio
   }
 }
 
@@ -287,7 +452,8 @@ async function composeGeneratedCharacter({
   maskImagePath,
   uploadDir,
   focus,
-  allowedBounds
+  allowedBounds,
+  expectedHeight
 }) {
   const background = await sharp(sourceImagePath)
     .rotate()
@@ -296,7 +462,14 @@ async function composeGeneratedCharacter({
     .toBuffer({ resolveWithObject: true })
   const width = background.info.width
   const height = background.info.height
-  const mask = await normalizeGeneratedMask(maskImagePath, width, height, focus, allowedBounds)
+  const mask = await normalizeGeneratedMask(
+    maskImagePath,
+    width,
+    height,
+    focus,
+    allowedBounds,
+    expectedHeight
+  )
   const candidate = await sharp(candidateImagePath)
     .rotate()
     .resize(width, height, { fit: 'fill' })
@@ -345,7 +518,9 @@ async function composeGeneratedCharacter({
     characterBounds: mask.bounds,
     shadowBounds: { x: shadowLeft, y: shadowTop, width: shadowWidth, height: shadowHeight },
     foregroundRatio: mask.foregroundRatio,
-    maskInverted: mask.inverted
+    maskInverted: mask.inverted,
+    maskOccupancy: mask.maskOccupancy,
+    filledHoleRatio: mask.filledHoleRatio
   }
 }
 
@@ -353,6 +528,9 @@ module.exports = {
   composeCharacter,
   composeGeneratedCharacter,
   normalizeGeneratedMask,
+  growComponentFromSeed,
+  fillSmallEnclosedHoles,
+  validateCharacterComponent,
   largestComponent,
   assertBackgroundPreserved,
   prepareSprite,

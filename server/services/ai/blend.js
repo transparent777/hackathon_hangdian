@@ -28,6 +28,19 @@ async function runStage(stage, fn) {
   }
 }
 
+function buildCandidateFallback(candidate, scenePlan, error) {
+  return {
+    ...candidate,
+    provider: `${candidate.provider}:candidate-fallback`,
+    scenePlan,
+    degraded: true,
+    backgroundPreserved: false,
+    fallbackKind: 'ai-candidate',
+    fallbackReason: log.sanitize(error.message),
+    failedStage: error.stage || 'unknown'
+  }
+}
+
 async function runAssetComposite({
   config,
   characterId,
@@ -135,8 +148,9 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
       deadline
     })
     const provider = getProvider(config)
+    let candidate = null
     try {
-      const candidate = await runStage('candidate_generation', () =>
+      candidate = await runStage('candidate_generation', () =>
         withSlot({ deadline, waitMs: Math.min(5000, timeoutMs) }, () =>
           provider.blendImage({ ...ctx, scenePlan })
         )
@@ -146,6 +160,7 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
           sourceImagePath: sourceFile.path,
           candidateImagePath: candidate.localPath,
           editRegion: candidate.editRegion,
+          scenePlan,
           uploadDir: UPLOAD_DIR,
           timeoutMs: Math.min(20000, remainingMs(deadline, config.timeoutMs))
         })
@@ -161,7 +176,9 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
           focus: {
             x: scenePlan.anchor.x * imageWidth,
             y: (scenePlan.anchor.y - scenePlan.scale / 2) * imageHeight
-          }
+          },
+          allowedBounds: mask.region,
+          expectedHeight: scenePlan.scale * imageHeight
         })
       })
       result = {
@@ -173,6 +190,8 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
         characterBounds: composed.characterBounds,
         shadowBounds: composed.shadowBounds,
         foregroundRatio: composed.foregroundRatio,
+        maskOccupancy: composed.maskOccupancy,
+        filledHoleRatio: composed.filledHoleRatio,
         segmentationModel: mask.model,
         degraded: false,
         backgroundPreserved: true
@@ -181,7 +200,9 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
         characterId,
         model: candidate.model,
         bounds: composed.characterBounds,
-        foregroundRatio: composed.foregroundRatio
+        foregroundRatio: composed.foregroundRatio,
+        maskOccupancy: composed.maskOccupancy,
+        filledHoleRatio: composed.filledHoleRatio
       })
     } catch (error) {
       log.warn('hybrid blend stage failed', {
@@ -189,19 +210,24 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
         message: log.sanitize(error.message)
       })
       if (!config.allowAssetFallback) throw error
-      result = await runAssetComposite({
-        config: { ...config, isDiaryLive: false },
-        characterId,
-        profile,
-        sourceFile,
-        publicBaseUrl,
-        deadline,
-        scenePlan: { ...buildFallbackScenePlan(profile), provider: 'fallback' }
-      })
-      result.fallbackReason = log.sanitize(error.message)
-      result.failedStage = error.stage || 'unknown'
-      result.degraded = true
-      result.backgroundPreserved = true
+      if (candidate) {
+        result = buildCandidateFallback(candidate, scenePlan, error)
+      } else {
+        result = await runAssetComposite({
+          config: { ...config, isDiaryLive: false },
+          characterId,
+          profile,
+          sourceFile,
+          publicBaseUrl,
+          deadline,
+          scenePlan: { ...buildFallbackScenePlan(profile), provider: 'fallback' }
+        })
+        result.fallbackKind = 'asset-composite'
+        result.fallbackReason = log.sanitize(error.message)
+        result.failedStage = error.stage || 'unknown'
+        result.degraded = true
+        result.backgroundPreserved = true
+      }
     }
   }
 
@@ -214,5 +240,6 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
 
 module.exports = {
   runBlend,
-  runAssetComposite
+  runAssetComposite,
+  buildCandidateFallback
 }

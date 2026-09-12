@@ -12,11 +12,16 @@ Page({
     sourceImagePath: '',
     degraded: false,
     failedStage: '',
+    fallbackKind: '',
+    degradedLabel: '',
+    degradedNotice: '',
     isHistoryView: false
   },
 
   onLoad(options) {
     const character = getCharacterById(options.characterId || 'naiwa')
+    const fallbackKind = decodeURIComponent(options.fallbackKind || '')
+    const candidateFallback = fallbackKind === 'ai-candidate'
     this.setData({
       imageUrl: decodeURIComponent(options.imageUrl || ''),
       quote: decodeURIComponent(options.quote || ''),
@@ -26,6 +31,11 @@ Page({
       sourceImagePath: decodeURIComponent(options.sourceImagePath || ''),
       degraded: options.degraded === '1',
       failedStage: decodeURIComponent(options.failedStage || ''),
+      fallbackKind,
+      degradedLabel: candidateFallback ? 'AI 完整图' : '基础合成',
+      degradedNotice: candidateFallback
+        ? '角色提取未完成，本图保留 AI 候选图，背景可能有轻微变化'
+        : 'AI 动作生成未完成，本图使用预设角色素材',
       isHistoryView: options.from === 'history'
     })
   },

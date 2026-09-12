@@ -42,7 +42,7 @@ test('builds the edit region around the planned character position', () => {
   assert.ok(region.x >= 0 && region.x + region.w <= 1)
 })
 
-test('expands the segmentation crop when Seedream draws beyond the requested region', () => {
+test('adds modest padding without pulling distant table objects into segmentation', () => {
   const region = expandRegion({ x1: 469, y1: 553, x2: 1237, y2: 1087, width: 1706, height: 1279 })
-  assert.deepEqual(region, { x: 162, y: 339, width: 1382, height: 940 })
+  assert.deepEqual(region, { x: 377, y: 489, width: 952, height: 662 })
 })

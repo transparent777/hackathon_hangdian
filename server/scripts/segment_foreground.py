@@ -30,6 +30,17 @@ def normalize_mask(prediction):
     return (prediction - low) / (high - low)
 
 
+def build_change_prior(source, candidate):
+    source_array = np.asarray(source, dtype=np.float32) / 255.0
+    candidate_array = np.asarray(candidate, dtype=np.float32) / 255.0
+    difference = np.mean(np.abs(candidate_array - source_array), axis=2)
+    low = float(np.percentile(difference, 35))
+    high = float(np.percentile(difference, 92))
+    if high - low < 1e-6:
+        return np.ones_like(difference, dtype=np.float32)
+    return np.clip((difference - low) / (high - low), 0.0, 1.0)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True)
@@ -42,7 +53,9 @@ def main():
     source = Image.open(args.source).convert("RGB")
     candidate = Image.open(args.candidate).convert("RGB").resize(source.size, Image.Resampling.LANCZOS)
     x, y, width, height = parse_region(args.region)
-    crop = candidate.crop((x, y, x + width, y + height))
+    crop_box = (x, y, x + width, y + height)
+    source_crop = source.crop(crop_box)
+    crop = candidate.crop(crop_box)
 
     session = ort.InferenceSession(args.model, providers=["CPUExecutionProvider"])
     model_input = session.get_inputs()[0]
@@ -52,6 +65,11 @@ def main():
         {model_input.name: preprocess(crop, input_size)},
     )[0]
     mask = normalize_mask(output)
+    change_prior = build_change_prior(
+        source_crop.resize((input_size, input_size), Image.Resampling.LANCZOS),
+        crop.resize((input_size, input_size), Image.Resampling.LANCZOS),
+    )
+    mask = np.maximum(mask, change_prior * 0.8)
     mask_image = Image.fromarray(np.uint8(mask * 255), mode="L")
     mask_image = mask_image.resize((width, height), Image.Resampling.LANCZOS).filter(ImageFilter.GaussianBlur(0.7))
 

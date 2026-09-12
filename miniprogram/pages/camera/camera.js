@@ -117,8 +117,9 @@ Page({
       console.log('[blend]', result.blendProvider || 'unknown', result.diaryProvider || 'unknown')
       if (result.degraded) {
         console.warn('[blend] degraded', result.failedStage, result.fallbackReason)
+        const candidateFallback = result.fallbackKind === 'ai-candidate'
         wx.showToast({
-          title: 'AI 动作生成失败，当前为基础合成',
+          title: candidateFallback ? '角色提取未完成，保留 AI 完整图' : 'AI 动作生成失败，当前为基础合成',
           icon: 'none',
           duration: 3000
         })
@@ -151,7 +152,8 @@ Page({
         `characterImage=${encodeURIComponent(characterImage)}`,
         `sourceImagePath=${encodeURIComponent(stableSourcePath)}`,
         `degraded=${result.degraded ? '1' : '0'}`,
-        `failedStage=${encodeURIComponent(result.failedStage || '')}`
+        `failedStage=${encodeURIComponent(result.failedStage || '')}`,
+        `fallbackKind=${encodeURIComponent(result.fallbackKind || '')}`
       ].join('&')
 
       wx.navigateTo({

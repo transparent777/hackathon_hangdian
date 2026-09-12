@@ -45,7 +45,7 @@ AI_DIARY_MODEL=deepseek-flash
 PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-`hybrid` 模式需要 `AI_API_KEY`、Python、Pillow、NumPy、ONNX Runtime 和 `models/u2netp.onnx`。失败时默认返回透明动作素材，同时用 `degraded`、`failedStage` 和 `fallbackReason` 明确标记；设置 `AI_ALLOW_ASSET_FALLBACK=false` 可改为直接返回错误。
+`hybrid` 模式需要 `AI_API_KEY`、Python、Pillow、NumPy、ONNX Runtime 和 `models/u2netp.onnx`。Seedream 成功但角色提取失败时默认保留完整 AI 候选图；候选图生成失败时才返回透明动作素材。两种降级都会通过 `degraded`、`failedStage`、`fallbackKind` 和 `fallbackReason` 明确标记；设置 `AI_ALLOW_ASSET_FALLBACK=false` 可改为直接返回错误。
 
 | `AI_BLEND_STRATEGY` | 行为 |
 |---------------------|------|

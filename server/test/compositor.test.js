@@ -134,3 +134,66 @@ test('rejects a mask that treats most of the image as foreground', async (t) => 
     .toFile(mask)
   await assert.rejects(() => normalizeGeneratedMask(mask, 100, 100))
 })
+
+test('fills small holes inside an otherwise valid character silhouette', async (t) => {
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-hole-fill-'))
+  t.after(() => fs.promises.rm(dir, { recursive: true, force: true }))
+  const mask = path.join(dir, 'mask.png')
+
+  await sharp(
+    Buffer.from(
+      '<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#000"/><rect x="30" y="20" width="40" height="60" fill="#fff"/><rect x="48" y="48" width="4" height="4" fill="#000"/></svg>'
+    )
+  )
+    .png()
+    .toFile(mask)
+
+  const output = await normalizeGeneratedMask(mask, 100, 100, { x: 50, y: 50 }, null, 60)
+  const pixel = await sharp(output.buffer)
+    .extract({ left: 50, top: 50, width: 1, height: 1 })
+    .raw()
+    .toBuffer()
+  assert.ok(pixel[3] > 200)
+  assert.ok(output.filledHoleRatio > 0)
+})
+
+test('grows a complete character from a high-confidence head into a low-confidence body', async (t) => {
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-hysteresis-'))
+  t.after(() => fs.promises.rm(dir, { recursive: true, force: true }))
+  const mask = path.join(dir, 'mask.png')
+
+  await sharp(
+    Buffer.from(
+      '<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#000"/><circle cx="50" cy="30" r="18" fill="#fff"/><rect x="35" y="45" width="30" height="42" rx="8" fill="#404040"/></svg>'
+    )
+  )
+    .png()
+    .toFile(mask)
+
+  const output = await normalizeGeneratedMask(mask, 100, 100, { x: 50, y: 35 }, null, 70)
+  const bodyPixel = await sharp(output.buffer)
+    .extract({ left: 50, top: 70, width: 1, height: 1 })
+    .raw()
+    .toBuffer()
+  assert.ok(bodyPixel[3] > 200)
+  assert.ok(output.bounds.height >= 70)
+})
+
+test('rejects a character silhouette with a large internal tear', async (t) => {
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-hole-reject-'))
+  t.after(() => fs.promises.rm(dir, { recursive: true, force: true }))
+  const mask = path.join(dir, 'mask.png')
+
+  await sharp(
+    Buffer.from(
+      '<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="#000"/><rect x="15" y="10" width="70" height="80" fill="#fff"/><rect x="25" y="25" width="50" height="50" fill="#000"/></svg>'
+    )
+  )
+    .png()
+    .toFile(mask)
+
+  await assert.rejects(
+    () => normalizeGeneratedMask(mask, 100, 100, { x: 50, y: 50 }, null, 80),
+    /大面积孔洞/
+  )
+})
