@@ -30,6 +30,17 @@ function fileExists(filePath) {
   })
 }
 
+function compressImage(filePath, quality = 80) {
+  return new Promise((resolve, reject) => {
+    wx.compressImage({
+      src: filePath,
+      quality,
+      success: (res) => resolve(res.tempFilePath),
+      fail: reject
+    })
+  })
+}
+
 function normalizeLocalApiUrl(url) {
   return String(url || '').replace('http://localhost:', 'http://127.0.0.1:')
 }
@@ -81,5 +92,6 @@ module.exports = {
   isTempImagePath,
   persistImagePath,
   ensureStableImagePath,
-  fileExists
+  fileExists,
+  compressImage
 }

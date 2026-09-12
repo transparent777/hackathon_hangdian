@@ -1,7 +1,7 @@
 const { fetchBlend } = require('../../utils/api')
 const { getCharacterById } = require('../../utils/characters')
 const { addHistory } = require('../../utils/history')
-const { ensureStableImagePath } = require('../../utils/image-path')
+const { ensureStableImagePath, compressImage } = require('../../utils/image-path')
 const { pickLoadingQuote } = require('../../utils/loading-quotes')
 
 Page({
@@ -48,10 +48,31 @@ Page({
     }
   },
 
-  onPreviewImageError() {
-    console.warn('preview image load failed', this.data.imagePath)
+  onPreviewImageError(e) {
+    const failedPath = this.data.imagePath
+    console.warn('preview image load failed', failedPath, e?.detail)
+
+    // 部分相册图（HEIC/超大图）需压缩为 JPEG 后才能预览，仅重试一次
+    if (failedPath && this._previewCompressTried !== failedPath) {
+      this._previewCompressTried = failedPath
+      compressImage(failedPath)
+        .then((compressedPath) => {
+          if (compressedPath && compressedPath !== failedPath) {
+            this.setData({ imagePath: compressedPath })
+            return
+          }
+          this.clearPreviewWithError()
+        })
+        .catch(() => this.clearPreviewWithError())
+      return
+    }
+
+    this.clearPreviewWithError()
+  },
+
+  clearPreviewWithError() {
     this.setData({ imagePath: '' })
-    wx.showToast({ title: '图片无法预览，请重选', icon: 'none' })
+    wx.showToast({ title: '图片无法预览，请换一张 JPG 或拍照', icon: 'none' })
   },
 
   chooseImage() {
@@ -62,24 +83,17 @@ Page({
       count: 1,
       mediaType: ['image'],
       sourceType: ['album', 'camera'],
+      // 优先压缩为 JPEG，减少相册 HEIC 在真机上无法预览的情况
+      sizeType: ['compressed'],
       success: (res) => {
         const tempPath = res.tempFiles[0]?.tempFilePath
         if (!tempPath) {
           wx.showToast({ title: '未获取到图片路径', icon: 'none' })
           return
         }
-        // 先展示临时路径，避免 saveFile 阻塞导致白屏
+        this._previewCompressTried = ''
+        // 预览始终用 chooseMedia 返回的临时路径；持久化推迟到点击溶图时
         this.setData({ imagePath: tempPath })
-        // 后台持久化：成功则静默换成稳定路径，供切页/再拍一张使用
-        ensureStableImagePath(tempPath)
-          .then((stablePath) => {
-            if (stablePath && stablePath !== tempPath && this.data.imagePath === tempPath) {
-              this.setData({ imagePath: stablePath })
-            }
-          })
-          .catch((error) => {
-            console.warn('background persist skipped', error)
-          })
       },
       fail: (err) => {
         if (err.errMsg && err.errMsg.includes('cancel')) return
@@ -106,9 +120,6 @@ Page({
       let uploadPath = imagePath
       try {
         uploadPath = await ensureStableImagePath(imagePath)
-        if (uploadPath !== imagePath) {
-          this.setData({ imagePath: uploadPath })
-        }
       } catch (pathError) {
         console.warn('use current image path for upload', pathError)
       }
