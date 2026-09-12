@@ -60,7 +60,7 @@
 4. 拼接 messages：
    - system: global.systemPrompt + global.outputRules
    - user text: characters[characterId].rarityLevels[rarityKey].prompt
-   - user image: resultUrl（溶图结果，角色已融入场景）
+   - user image: 用户上传原图（不含溶图角色；批注是对原图看图说话 + 角色口吻陪伴）
 5. 调用多模态大模型，截断至 maxLength
 6. 返回 diaryNote + fontStyle
 ```

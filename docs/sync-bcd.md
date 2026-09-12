@@ -87,7 +87,7 @@ openid       string    可选
 | `doro` | doro |
 | `maodie` | 耄耋 |
 
-**日记批注**：B 溶图成功后调多模态，读 `ai/diary-prompts.json` 中对应角色 + 稀有度 prompt，输入**溶图结果图**。
+**日记批注**：B 溶图成功后调多模态，读 `ai/diary-prompts.json` 中对应角色 + 稀有度 prompt，输入**用户原图**（对原图看图说话，再用角色语气表达陪伴）。
 
 **阻塞 B 的事项**：`providers/http.js` 真实溶图 API 未实现 / 参考图未放入 `ai/references/`。
 

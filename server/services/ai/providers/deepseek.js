@@ -96,7 +96,7 @@ async function generateDiaryNote(ctx) {
 
   const imageDataUri = fileToDataUri(imagePath)
   if (!imageDataUri) {
-    throw new Error('日记批注缺少溶图结果图')
+    throw new Error('日记批注缺少用户原图')
   }
 
   const { system, userText } = buildDiaryMessages(promptBundle)
