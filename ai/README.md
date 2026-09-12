@@ -21,8 +21,9 @@
 server/services/ai/blend.js  ──读──► ai/prompts/{id}.json
         │
         ▼
-providers/mock.js     AI_MODE=mock（默认，回传原图 URL）
-providers/http.js     AI_MODE=live + AI_API_KEY（火山方舟 Seedream 溶图）
+scene.js              DeepSeek 分析场景，选择角色动作、落脚点和比例
+compositor.js         Sharp 将透明角色和接触阴影合成到原始照片
+providers/http.js     AI_BLEND_STRATEGY=seedream-full 时保留旧整图 Seedream 路径
         │
         ▼
 溶图结果图 URL

@@ -63,8 +63,7 @@ function loadBlendPrompt(characterId) {
     referenceImage: `references/${id}.jpg`,
     blend: {
       prompt: buildBuiltinBlendPrompt(id),
-      negativePrompt: '',
-      strength: 0.65
+      negativePrompt: ''
     },
     _source: 'builtin'
   }
@@ -82,6 +81,29 @@ function getBlendPromptSource(characterId) {
 function buildBlendPromptText(characterId) {
   const cfg = loadBlendPrompt(characterId)
   return cfg.blend?.prompt || ''
+}
+
+function getCompositionProfile(characterId) {
+  const cfg = loadBlendPrompt(characterId)
+  const composition = cfg.composition || {}
+  return {
+    characterName: cfg.name || BUILTIN_NAMES[characterId] || characterId,
+    identityLock: composition.identityLock || '',
+    actionStyle: composition.actionStyle || '',
+    defaultVariant: composition.defaultVariant || composition.variants?.[0]?.id || '',
+    defaultAnchor: composition.defaultAnchor || { x: 0.5, y: 0.88 },
+    defaultScale: composition.defaultScale || 0.25,
+    variants: Array.isArray(composition.variants) ? composition.variants : []
+  }
+}
+
+function resolveVariantImagePath(characterId, variantId) {
+  const profile = getCompositionProfile(characterId)
+  const selected = profile.variants.find((item) => String(item.id) === String(variantId))
+  const fallback = profile.variants.find((item) => String(item.id) === String(profile.defaultVariant))
+  const variant = selected || fallback || profile.variants[0]
+  if (!variant?.file) return null
+  return path.join(AI_ROOT, 'references', variant.file)
 }
 
 function resolveReferenceImagePath(characterId) {
@@ -159,6 +181,8 @@ module.exports = {
   loadBlendPrompt,
   getBlendPromptSource,
   buildBlendPromptText,
+  getCompositionProfile,
+  resolveVariantImagePath,
   resolveReferenceImagePath,
   getDiaryPromptBundle,
   pickQuote,

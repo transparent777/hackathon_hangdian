@@ -71,6 +71,7 @@ function loadAiRuntimeConfig() {
     apiKey,
     apiBaseUrl,
     blendModel: resolveBlendModel(),
+    blendStrategy: envStr('AI_BLEND_STRATEGY', aiDefaults.blend?.defaultStrategy || 'hybrid').toLowerCase(),
     blendVariant: (process.env.AI_BLEND_VARIANT || aiDefaults.seedream?.defaultVariant || 'lite').toLowerCase(),
     blendSize: resolveBlendSize(resolveBlendModel()),
     diaryApiKey,
@@ -102,6 +103,7 @@ function describeAiHealth() {
     live: config.isLive,
     diaryLive: config.isDiaryLive,
     blendModel: config.blendModel,
+    blendStrategy: config.blendStrategy,
     diaryModel: config.diaryModel,
     concurrency: { limit: config.concurrency, active: stats.active, pending: stats.pending },
     uploadTtlHours: config.uploadTtlHours,
@@ -122,7 +124,7 @@ function describeAiHealth() {
 
 function logAiBootSummary(config) {
   console.log(
-    `[ai] mode=${config.mode} blend=${config.isLive} model=${config.blendModel} size=${config.blendSize} key=${maskSecret(config.apiKey)} | diary=${config.isDiaryLive} model=${config.diaryModel} key=${maskSecret(config.diaryApiKey)}`
+    `[ai] mode=${config.mode} blend=${config.isLive} strategy=${config.blendStrategy} model=${config.blendModel} size=${config.blendSize} key=${maskSecret(config.apiKey)} | diary=${config.isDiaryLive} model=${config.diaryModel} key=${maskSecret(config.diaryApiKey)}`
   )
 }
 

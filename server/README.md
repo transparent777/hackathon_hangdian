@@ -14,7 +14,7 @@ npm start
 ## AI 架构（原 C 职责）
 
 ```
-ai/prompts/*.json          溶图 prompt（占位英文，联调时改）
+ai/prompts/*.json          角色身份约束、透明动作候选和旧溶图 prompt
 ai/diary-prompts.json      日记多模态 prompt（已冻结）
 ai/quotes.json             陪伴语池
 server/services/ai/        运行时：blend + diary + providers
@@ -22,15 +22,16 @@ server/services/ai/        运行时：blend + diary + providers
 
 | `AI_MODE` | 行为 |
 |-----------|------|
-| `mock` | 溶图回传原图 URL，日记用 fallback 文案 |
-| `live` | 溶图走火山方舟 Seedream 5.0；日记走 DeepSeek 多模态（各自 Key） |
+| `mock` | 使用默认动作和位置完成本地合成；日记用 fallback 文案 |
+| `live` | DeepSeek 读取场景并选择动作、位置；本地合成角色；日记走 DeepSeek 多模态 |
 
 **`.env` 示例**（Key 自行填入，勿提交）：
 
 ```env
 AI_MODE=live
+AI_BLEND_STRATEGY=hybrid
 
-# 溶图 · 火山方舟
+# 旧整图 Seedream 兼容策略（仅 AI_BLEND_STRATEGY=seedream-full 时使用）
 AI_API_KEY=你的火山方舟密钥
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
 AI_BLEND_VARIANT=pro
@@ -44,12 +45,14 @@ AI_DIARY_MODEL=deepseek-flash
 PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-| `AI_BLEND_VARIANT` | 溶图模型 |
-|--------------------|------|
-| `pro`（默认） | `doubao-seedream-5-0-pro-260628` |
-| `lite` | `doubao-seedream-5-0-260128` |
+`hybrid` 模式不需要 `AI_API_KEY`；`AI_DIARY_API_KEY` 未配置或场景分析失败时，系统使用每个角色配置的默认动作和落脚点继续完成合成。
 
-溶图：`providers/http.js` · 日记：`providers/deepseek.js`。**密钥勿写进代码**。
+| `AI_BLEND_STRATEGY` | 行为 |
+|---------------------|------|
+| `hybrid`（默认） | 场景分析选择透明动作素材，Sharp 在原图上确定性合成；背景不会被模型重绘 |
+| `seedream-full` | 保留旧 Seedream 整图编辑路径；不能保证背景像素不变 |
+
+场景分析/日记：`providers/deepseek.js` · 合成：`compositor.js` · 旧整图路径：`providers/http.js`。**密钥勿写进代码**。
 
 ## 安全
 

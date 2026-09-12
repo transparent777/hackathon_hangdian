@@ -1,7 +1,7 @@
 {
   "_readme": "非敏感 AI 默认参数。密钥、基址见 server/.env.example。",
   "blend": {
-    "defaultStrength": 0.65,
+    "defaultStrategy": "hybrid",
     "timeoutMs": 90000,
     "maxRetries": 1
   },

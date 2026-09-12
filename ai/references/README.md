@@ -4,11 +4,11 @@
 
 | 文件 | 角色 | 说明 |
 |------|------|------|
-| `naiwa.jpg` | 奶蛙 | 溶图时作为「角色外观唯一依据」传给 API |
+| `naiwa.jpg` | 奶蛙 | 角色原始形象参考 |
 | `doro.jpg` | doro | 同上 |
 | `maodie.jpg` | 耄耋 | 同上 |
 
-`ai/prompts/*.json` 的 `referenceImage` 指向上述文件，供撰写 prompt 时对照角色外观；**方案 A 溶图不会把参考图上传给 Seedream**，角色外观由 `blend.prompt` 文字描述。
+默认 `hybrid` 流程读取 `ai/prompts/*.json` 的 `composition.variants`，由场景分析选择带透明通道的动作图，再确定性合成到用户原图。`referenceImage` 保留为原始形象依据；旧 `seedream-full` 策略仍使用文字描述进行整图编辑。
 
 ## 扩展素材库
 
