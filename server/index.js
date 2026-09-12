@@ -109,7 +109,7 @@ app.post('/api/blend', (req, res) => {
         diaryResult = await runDiary({
           characterId,
           rarityLabel: rarity,
-          imagePath: blendResult.localPath || file.path,
+          imagePath: file.path,
           deadline
         })
       } catch (diaryError) {
