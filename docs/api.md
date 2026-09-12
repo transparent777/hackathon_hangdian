@@ -42,6 +42,9 @@
 ```json
 {
   "resultUrl": "https://...",
+  "blended": true,
+  "blendProvider": "seedream-extract-composite",
+  "backgroundPreserved": true,
   "companionText": "今天在窗边陪你晒太阳",
   "diaryNote": "阳光落在书页上…",
   "fontStyle": "naiwa",
@@ -49,9 +52,11 @@
 }
 ```
 
+`hybrid` 模式不会直接返回 Seedream 整图候选。`backgroundPreserved=true` 表示结果已将角色和局部阴影覆盖回原始照片，并通过区域外像素完整性检查；蒙版生成失败时 `blendProvider` 会以 `asset-composite:` 开头。
+
 ## 健康检查
 
-`GET /` 未实现；可用 `POST /roll` 冒烟。
+使用 `GET /health` 查看当前 `blendStrategy`；也可用 `POST /roll` 冒烟。
 
 本地启动：`cd server && npm install && npm start`
 

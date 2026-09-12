@@ -126,6 +126,8 @@ app.post('/api/blend', (req, res) => {
       res.json({
         resultUrl: blendResult.resultUrl,
         blended: blendResult.blended !== false,
+        blendProvider: blendResult.provider || 'unknown',
+        backgroundPreserved: blendResult.provider !== 'volcengine-seedream-5-pro-edit',
         companionText: pickQuote(characterId),
         diaryNote: diaryResult.diaryNote,
         fontStyle: diaryResult.fontStyle,

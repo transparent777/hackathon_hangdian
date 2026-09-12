@@ -8,7 +8,7 @@
 | `doro.jpg` | doro | 同上 |
 | `maodie.jpg` | 耄耋 | 同上 |
 
-默认 `hybrid` 流程读取 `ai/prompts/*.json` 的 `composition.variants`，由场景分析选择带透明通道的动作图，再确定性合成到用户原图。`referenceImage` 保留为原始形象依据；旧 `seedream-full` 策略仍使用文字描述进行整图编辑。
+默认 `hybrid` 流程将 `referenceImage` 与用户场景一并交给 Seedream 生成候选图，再通过角色蒙版将候选角色覆盖回原始背景。`composition.variants` 用于 `asset-composite` 策略和任何生成/蒙版失败时的安全回退。
 
 ## 扩展素材库
 

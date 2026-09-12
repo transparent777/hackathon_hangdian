@@ -1,6 +1,6 @@
 /**
- * 火山方舟 · 豆包 Seedream 5.0 Pro 交互编辑溶图（live · 方案 A）
- * 单图 + 坐标区域编辑，不传角色参考图，避免多图融合重绘背景。
+ * 火山方舟 · Seedream 候选图生成。
+ * 默认 hybrid 流程不会直接返回候选图，而是提取角色后覆盖回原始照片。
  * 文档：https://www.volcengine.com/docs/82379
  */
 const path = require('path')
@@ -59,12 +59,12 @@ function resolveEditRegionPixels(sourceImagePath, editRegion) {
 
 function buildBlendPrompt(promptText, negativePrompt = '', editRegionText = '') {
   const global = [
-    '【编辑方式】Seedream Pro 交互编辑：仅在上传的用户生活照指定坐标区域内新增一个桌面小宠物角色；坐标以外所有像素必须逐像素保留，不得重绘、替换或修改背景。',
+    '【编辑方式】在图片1的真实场景中新增图片2的桌面小宠物角色，让角色根据场景中的显著物体自然调整表情和动作。',
     editRegionText,
-    '【角色尺寸】手掌大小的小摆件，高度约为画面高度的百分之五到百分之八，像桌上小物件，不要巨大化。',
+    '【角色尺寸】桌面小宠物高度约为画面高度的百分之二十到百分之三十，不要巨大化。',
     '【光影融合】匹配原图室内暖光方向与色温，在角色脚下添加柔和接触阴影，让它真的站在接触面上。',
     '【构图】角色只出现在编辑区域内，不遮挡人脸与主要食物；无水印无文字。',
-    '【允许微调】仅可微调姿势、表情与朝向；不得改变角色辨识度、配色、描边风格与平面梗图画风。'
+    '【允许变化】只允许改变姿势、表情与朝向；不得改变角色辨识度、脸部纹理、配色、描边风格与平面梗图画风。'
   ].filter(Boolean).join(' ')
 
   const parts = [global, promptText].filter(Boolean)
@@ -76,26 +76,18 @@ function buildBlendPrompt(promptText, negativePrompt = '', editRegionText = '') 
 }
 
 function resolveBlendModel(config) {
-  const model = config.blendModel || PRO_MODEL_ID
-  if (model !== PRO_MODEL_ID) {
-    log.warn('溶图方案 A 需要 Seedream Pro 交互编辑，已自动切换模型', {
-      requested: model,
-      using: PRO_MODEL_ID
-    })
-    return PRO_MODEL_ID
-  }
-  return model
+  return config.blendModel || PRO_MODEL_ID
 }
 
-function buildSeedreamBody({ model, prompt, sourceImageDataUri }) {
+function buildSeedreamBody({ model, prompt, image, watermark }) {
   return {
     model,
     prompt,
-    image: sourceImageDataUri,
+    image,
     size: resolveBlendSize(model),
     response_format: 'url',
     stream: false,
-    watermark: process.env.AI_BLEND_WATERMARK !== 'false'
+    watermark: watermark ?? process.env.AI_BLEND_WATERMARK !== 'false'
   }
 }
 
@@ -149,17 +141,35 @@ async function blendImage(ctx) {
   const editRegionText = `【编辑区域】仅在坐标 ${region.x1} ${region.y1} ${region.x2} ${region.y2} 内生成角色；该区域以外画面全部保持原样。`
 
   const model = resolveBlendModel(config)
-  const prompt = buildBlendPrompt(promptText, negativePrompt, editRegionText)
+  const sceneDirection = ctx.scenePlan
+    ? `【场景互动】${ctx.scenePlan.expression}；${ctx.scenePlan.action}；${ctx.scenePlan.interaction}。角色脚底中心约在归一化坐标 (${ctx.scenePlan.anchor.x}, ${ctx.scenePlan.anchor.y})，角色高度约占画面 ${Math.round(ctx.scenePlan.scale * 100)}%。`
+    : ''
+  const referenceImageDataUri = fileToDataUri(referenceImagePath)
+  const rolePrompt = referenceImageDataUri
+    ? '【图片职责】图片1是必须保持构图的生活场景，图片2是角色身份与画风的唯一参考。只允许角色根据场景改变表情和动作，不得把图片2作为画中画贴入。'
+    : ''
+  const prompt = buildBlendPrompt(
+    [rolePrompt, sceneDirection, promptText].filter(Boolean).join(' '),
+    negativePrompt,
+    editRegionText
+  )
 
-  log.info('seedream blend request (scheme A: single-image interactive edit)', {
+  log.info('seedream candidate request (scene + character reference)', {
     characterId: ctx.characterId,
     model,
     imageSize: `${region.width}x${region.height}`,
     editRegion: `${region.x1},${region.y1},${region.x2},${region.y2}`,
-    referenceImagePath: referenceImagePath || '(prompt-only, not uploaded)'
+    referenceImagePath: referenceImagePath || '(missing)'
   })
 
-  const body = buildSeedreamBody({ model, prompt, sourceImageDataUri })
+  const body = buildSeedreamBody({
+    model,
+    prompt,
+    image: referenceImageDataUri
+      ? [sourceImageDataUri, referenceImageDataUri]
+      : sourceImageDataUri,
+    watermark: false
+  })
   const remoteUrl = await callSeedreamGeneration(config, body, {
     timeoutMs: timeoutMs || config.timeoutMs,
     deadline: deadline || 0
@@ -179,10 +189,43 @@ async function blendImage(ctx) {
   }
 }
 
+async function generateCharacterMask(ctx) {
+  const { config, candidateImagePath, uploadDir, timeoutMs, deadline } = ctx
+  const candidateImageDataUri = fileToDataUri(candidateImagePath)
+  if (!candidateImageDataUri) throw new Error('缺少 Seedream 候选图，无法生成角色蒙版')
+
+  const model = resolveBlendModel(config)
+  const prompt = [
+    '把输入图片转换为严格的黑白二值分割蒙版，画布尺寸、宽高比和所有物体位置必须与输入完全一致。',
+    '只把画面中明显属于插画或表情包风格的卡通桌面宠物完整区域画成纯白色，包括脸、身体、手脚、衣物和黑色描边。',
+    '照片原有的桌子、食物、餐具、墙壁、人物以及其他所有背景必须是纯黑色。',
+    '不要移动、缩放或重画角色轮廓，不要输出原照片，不要灰色、阴影、文字、水印和额外图形。'
+  ].join(' ')
+  const body = buildSeedreamBody({
+    model,
+    prompt,
+    image: candidateImageDataUri,
+    watermark: false
+  })
+  const remoteUrl = await callSeedreamGeneration(config, body, {
+    timeoutMs: timeoutMs || config.timeoutMs,
+    deadline: deadline || 0
+  })
+  const filename = await downloadImageToDir(remoteUrl, uploadDir)
+
+  return {
+    localPath: path.join(uploadDir, filename),
+    remoteUrl,
+    model
+  }
+}
+
 module.exports = {
   blendImage,
   PRO_MODEL_ID,
   DEFAULT_EDIT_REGION,
   resolveEditRegionPixels,
-  buildBlendPrompt
+  buildBlendPrompt,
+  generateCharacterMask,
+  buildSeedreamBody
 }

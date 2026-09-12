@@ -4,7 +4,11 @@ const fs = require('fs')
 const os = require('os')
 const path = require('path')
 const sharp = require('sharp')
-const { composeCharacter } = require('../services/ai/compositor')
+const {
+  composeCharacter,
+  composeGeneratedCharacter,
+  normalizeGeneratedMask
+} = require('../services/ai/compositor')
 
 test('keeps every pixel outside the character and shadow bounds unchanged', async (t) => {
   const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-composite-'))
@@ -56,4 +60,57 @@ test('keeps every pixel outside the character and shadow bounds unchanged', asyn
     }
   }
   assert.ok(changedInside > 0)
+})
+
+test('restores the original background around an extracted generated character', async (t) => {
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-extract-'))
+  t.after(() => fs.promises.rm(dir, { recursive: true, force: true }))
+  const source = path.join(dir, 'source.png')
+  const candidate = path.join(dir, 'candidate.png')
+  const mask = path.join(dir, 'mask.png')
+
+  await sharp({
+    create: { width: 240, height: 180, channels: 4, background: { r: 45, g: 90, b: 135, alpha: 1 } }
+  })
+    .png()
+    .toFile(source)
+  await sharp({
+    create: { width: 240, height: 180, channels: 4, background: { r: 210, g: 180, b: 150, alpha: 1 } }
+  })
+    .composite([
+      {
+        input: Buffer.from('<svg width="240" height="180" xmlns="http://www.w3.org/2000/svg"><rect x="150" y="45" width="55" height="90" rx="20" fill="#fff"/></svg>')
+      }
+    ])
+    .png()
+    .toFile(candidate)
+  await sharp(
+    Buffer.from('<svg width="240" height="180" xmlns="http://www.w3.org/2000/svg"><rect width="240" height="180" fill="#000"/><rect x="150" y="45" width="55" height="90" rx="20" fill="#fff"/><rect x="5" y="5" width="8" height="4" fill="#fff"/></svg>')
+  )
+    .png()
+    .toFile(mask)
+
+  const output = await composeGeneratedCharacter({
+    sourceImagePath: source,
+    candidateImagePath: candidate,
+    maskImagePath: mask,
+    uploadDir: dir
+  })
+  assert.ok(output.foregroundRatio > 0.05)
+  assert.ok(output.foregroundRatio < 0.2)
+  const originalPixel = await sharp(source).extract({ left: 20, top: 20, width: 1, height: 1 }).raw().toBuffer()
+  const outputPixel = await sharp(output.localPath).extract({ left: 20, top: 20, width: 1, height: 1 }).raw().toBuffer()
+  assert.deepEqual(outputPixel, originalPixel)
+})
+
+test('rejects a mask that treats most of the image as foreground', async (t) => {
+  const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-mask-'))
+  t.after(() => fs.promises.rm(dir, { recursive: true, force: true }))
+  const mask = path.join(dir, 'bad-mask.png')
+  await sharp({
+    create: { width: 100, height: 100, channels: 3, background: { r: 255, g: 255, b: 255 } }
+  })
+    .png()
+    .toFile(mask)
+  await assert.rejects(() => normalizeGeneratedMask(mask, 100, 100))
 })

@@ -35,6 +35,8 @@
 ```json
 {
   "resultUrl": "https://...",
+  "blendProvider": "seedream-extract-composite",
+  "backgroundPreserved": true,
   "companionText": "今天在窗边陪你晒太阳",
   "taskId": "blend-xxx",
   "diaryNote": "阳光落在书页上，我蜷在你手边，哪儿都不想去。",
