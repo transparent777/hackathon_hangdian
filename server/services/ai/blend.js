@@ -13,7 +13,7 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
   assertSupportedImageFile(sourceFile.path)
 
   const provider = getProvider(config)
-  const promptText = buildBlendPromptText(characterId, rarityLabel)
+  const promptText = buildBlendPromptText(characterId)
   const blendCfg = loadBlendPrompt(characterId)
   if (blendCfg._source === 'builtin') {
     log.warn('溶图使用内置 prompt 兜底', { characterId })
