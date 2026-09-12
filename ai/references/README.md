@@ -8,8 +8,7 @@
 | `doro.jpg` | doro | 同上 |
 | `maodie.jpg` | 耄耋 | 同上 |
 
-`ai/prompts/*.json` 的 `referenceImage` 指向上述文件。  
-由 `server/services/ai/blend.js` 解析后，与用户生活照一并传给 Seedream。
+`ai/prompts/*.json` 的 `referenceImage` 指向上述文件，供撰写 prompt 时对照角色外观；**方案 A 溶图不会把参考图上传给 Seedream**，角色外观由 `blend.prompt` 文字描述。
 
 ## 扩展素材库
 

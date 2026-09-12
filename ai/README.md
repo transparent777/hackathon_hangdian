@@ -47,7 +47,7 @@ AI_API_KEY=你的火山方舟_API_Key
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
 
 # 二选一：variant 快捷切换，或直接写完整 model id
-AI_BLEND_VARIANT=lite          # lite | pro | 4.5
+AI_BLEND_VARIANT=pro           # pro | lite | 4.5（溶图方案 A 需 pro）
 # AI_BLEND_MODEL=doubao-seedream-5-0-pro-260628
 
 AI_BLEND_SIZE=2K               # lite: 2K/3K/4K；pro: 1K/2K
@@ -61,8 +61,8 @@ PUBLIC_BASE_URL=http://localhost:3000
 
 | variant | 模型 ID | 说明 |
 |---------|---------|------|
-| `lite`（默认） | `doubao-seedream-5-0-260128` | 5.0 Lite，溶图推荐 |
-| `pro` | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，画质更好 |
+| `pro`（默认） | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，单图交互编辑溶图 |
+| `lite` | `doubao-seedream-5-0-260128` | 5.0 Lite，不支持方案 A |
 | `4.5` | `doubao-seedream-4-5-251128` | 旧版兼容 |
 
 溶图：`providers/http.js` · 日记：`providers/deepseek.js`。
