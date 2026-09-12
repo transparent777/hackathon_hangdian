@@ -7,7 +7,8 @@ const sharp = require('sharp')
 const {
   composeCharacter,
   composeGeneratedCharacter,
-  normalizeGeneratedMask
+  normalizeGeneratedMask,
+  largestComponent
 } = require('../services/ai/compositor')
 
 test('keeps every pixel outside the character and shadow bounds unchanged', async (t) => {
@@ -62,6 +63,20 @@ test('keeps every pixel outside the character and shadow bounds unchanged', asyn
   assert.ok(changedInside > 0)
 })
 
+test('selects the valid component nearest the planned character center', () => {
+  const width = 100
+  const height = 100
+  const binary = new Uint8Array(width * height)
+  for (let y = 10; y < 40; y += 1) {
+    for (let x = 10; x < 40; x += 1) binary[y * width + x] = 1
+  }
+  for (let y = 60; y < 80; y += 1) {
+    for (let x = 65; x < 85; x += 1) binary[y * width + x] = 1
+  }
+  const component = largestComponent(binary, width, height, { x: 75, y: 70 })
+  assert.deepEqual(component.bounds, { x: 65, y: 60, width: 20, height: 20 })
+})
+
 test('restores the original background around an extracted generated character', async (t) => {
   const dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'companion-extract-'))
   t.after(() => fs.promises.rm(dir, { recursive: true, force: true }))
@@ -101,6 +116,11 @@ test('restores the original background around an extracted generated character',
   const originalPixel = await sharp(source).extract({ left: 20, top: 20, width: 1, height: 1 }).raw().toBuffer()
   const outputPixel = await sharp(output.localPath).extract({ left: 20, top: 20, width: 1, height: 1 }).raw().toBuffer()
   assert.deepEqual(outputPixel, originalPixel)
+  const characterPixel = await sharp(output.localPath)
+    .extract({ left: 175, top: 80, width: 1, height: 1 })
+    .raw()
+    .toBuffer()
+  assert.deepEqual([...characterPixel.slice(0, 3)], [255, 255, 255])
 })
 
 test('rejects a mask that treats most of the image as foreground', async (t) => {

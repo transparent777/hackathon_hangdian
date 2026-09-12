@@ -3,10 +3,10 @@ const deepseek = require('./providers/deepseek')
 
 const DEFAULT_PLAN = {
   variantId: '',
-  expression: '自然地看向画面中的主要物体',
-  action: '保持角色原有动作',
-  interaction: '陪伴当前场景',
-  anchor: { x: 0.5, y: 0.88 },
+  expression: '根据画面里最显著的物体产生自然且有辨识度的表情',
+  action: '根据接触面和附近物体设计新的姿势，可以趴、探头、伸手或侧身观察',
+  interaction: '必须与画面中真实可见的具体物体形成动作或视线互动',
+  anchor: { x: 0.5, y: 0.82 },
   scale: 0.25,
   rotation: 0
 }
@@ -17,11 +17,12 @@ function clamp(value, min, max, fallback) {
 }
 
 function buildFallbackScenePlan(profile = {}) {
+  const configuredAnchor = profile.defaultAnchor || DEFAULT_PLAN.anchor
   return normalizeScenePlan(
     {
       ...DEFAULT_PLAN,
       variantId: profile.defaultVariant || profile.variants?.[0]?.id || '',
-      anchor: profile.defaultAnchor || DEFAULT_PLAN.anchor,
+      anchor: { x: configuredAnchor.x, y: Math.min(configuredAnchor.y, 0.82) },
       scale: profile.defaultScale || DEFAULT_PLAN.scale
     },
     profile
@@ -29,10 +30,11 @@ function buildFallbackScenePlan(profile = {}) {
 }
 
 function normalizeScenePlan(candidate, profile = {}) {
+  const configuredAnchor = profile.defaultAnchor || DEFAULT_PLAN.anchor
   const fallback = {
     ...DEFAULT_PLAN,
     variantId: profile.defaultVariant || profile.variants?.[0]?.id || '',
-    anchor: profile.defaultAnchor || DEFAULT_PLAN.anchor,
+    anchor: { x: configuredAnchor.x, y: Math.min(configuredAnchor.y, 0.82) },
     scale: profile.defaultScale || DEFAULT_PLAN.scale
   }
   const allowedVariantIds = new Set((profile.variants || []).map((item) => String(item.id)))

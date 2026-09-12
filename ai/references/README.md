@@ -8,7 +8,7 @@
 | `doro.jpg` | doro | 同上 |
 | `maodie.jpg` | 耄耋 | 同上 |
 
-默认 `hybrid` 流程将 `referenceImage` 与用户场景一并交给 Seedream 生成候选图，再通过角色蒙版将候选角色覆盖回原始背景。`composition.variants` 用于 `asset-composite` 策略和任何生成/蒙版失败时的安全回退。
+默认 `hybrid` 流程将 `referenceImage` 与用户场景一并交给 Seedream Pro 生成候选图，再通过本地 U2Net-P 分割将候选角色覆盖回原始背景。`composition.variants` 用于 `asset-composite` 策略，以及候选生成、分割或合成失败时的安全回退。
 
 ## 扩展素材库
 

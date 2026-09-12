@@ -1,6 +1,6 @@
 /**
  * 火山方舟 · Seedream 候选图生成。
- * 默认 hybrid 流程不会直接返回候选图，而是提取角色后覆盖回原始照片。
+ * 默认 hybrid 流程不会直接返回候选图，而是本地提取角色后覆盖回原始照片。
  * 文档：https://www.volcengine.com/docs/82379
  */
 const path = require('path')
@@ -91,6 +91,19 @@ function buildSeedreamBody({ model, prompt, image, watermark }) {
   }
 }
 
+function resolveSceneEditRegion(scenePlan, fallback) {
+  if (!scenePlan) return fallback
+  const width = Math.max(0.32, Math.min(0.5, scenePlan.scale * 1.8))
+  const top = Math.max(0, scenePlan.anchor.y - Math.max(0.32, scenePlan.scale * 1.55))
+  const bottom = Math.min(1, scenePlan.anchor.y + scenePlan.scale * 0.12)
+  return {
+    x: Math.max(0, Math.min(1 - width, scenePlan.anchor.x - width / 2)),
+    y: top,
+    w: width,
+    h: Math.max(0.2, bottom - top)
+  }
+}
+
 async function callSeedreamGeneration(config, body, { timeoutMs, deadline }) {
   const url = `${resolveArkBaseUrl(config)}/api/v3/images/generations`
 
@@ -137,7 +150,10 @@ async function blendImage(ctx) {
     throw new Error('缺少用户原图，无法溶图')
   }
 
-  const region = resolveEditRegionPixels(sourceImagePath, editRegion)
+  const region = resolveEditRegionPixels(
+    sourceImagePath,
+    resolveSceneEditRegion(ctx.scenePlan, editRegion)
+  )
   const editRegionText = `【编辑区域】仅在坐标 ${region.x1} ${region.y1} ${region.x2} ${region.y2} 内生成角色；该区域以外画面全部保持原样。`
 
   const model = resolveBlendModel(config)
@@ -189,43 +205,12 @@ async function blendImage(ctx) {
   }
 }
 
-async function generateCharacterMask(ctx) {
-  const { config, candidateImagePath, uploadDir, timeoutMs, deadline } = ctx
-  const candidateImageDataUri = fileToDataUri(candidateImagePath)
-  if (!candidateImageDataUri) throw new Error('缺少 Seedream 候选图，无法生成角色蒙版')
-
-  const model = resolveBlendModel(config)
-  const prompt = [
-    '把输入图片转换为严格的黑白二值分割蒙版，画布尺寸、宽高比和所有物体位置必须与输入完全一致。',
-    '只把画面中明显属于插画或表情包风格的卡通桌面宠物完整区域画成纯白色，包括脸、身体、手脚、衣物和黑色描边。',
-    '照片原有的桌子、食物、餐具、墙壁、人物以及其他所有背景必须是纯黑色。',
-    '不要移动、缩放或重画角色轮廓，不要输出原照片，不要灰色、阴影、文字、水印和额外图形。'
-  ].join(' ')
-  const body = buildSeedreamBody({
-    model,
-    prompt,
-    image: candidateImageDataUri,
-    watermark: false
-  })
-  const remoteUrl = await callSeedreamGeneration(config, body, {
-    timeoutMs: timeoutMs || config.timeoutMs,
-    deadline: deadline || 0
-  })
-  const filename = await downloadImageToDir(remoteUrl, uploadDir)
-
-  return {
-    localPath: path.join(uploadDir, filename),
-    remoteUrl,
-    model
-  }
-}
-
 module.exports = {
   blendImage,
   PRO_MODEL_ID,
   DEFAULT_EDIT_REGION,
   resolveEditRegionPixels,
+  resolveSceneEditRegion,
   buildBlendPrompt,
-  generateCharacterMask,
   buildSeedreamBody
 }

@@ -18,6 +18,26 @@
   height: 100%;
 }
 
+.blend-status {
+  position: absolute;
+  top: 18rpx;
+  left: 18rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 6rpx;
+  background: rgba(25, 25, 25, 0.82);
+  color: #fff;
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.degraded-notice {
+  margin-top: 18rpx;
+  color: #a33a2b;
+  font-size: 24rpx;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .character-sticker {
   position: absolute;
   right: 24rpx;

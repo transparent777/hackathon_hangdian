@@ -116,7 +116,9 @@ function uploadBlend({ characterId, imagePath, openid, rarity }) {
               return
             }
 
-            reject(new Error(data?.message || '溶图失败'))
+            const requestError = new Error(data?.message || '溶图失败')
+            requestError.failedStage = data?.failedStage || ''
+            reject(requestError)
           },
           fail: (error) => {
             const hint = String(error?.errMsg || error?.message || '')

@@ -3,7 +3,9 @@
     <view class="polaroid card card--tilt-left">
       <view class="photo-frame">
         <image class="bg-photo" src="{{imageUrl}}" mode="aspectFill" />
+        <view class="blend-status" wx:if="{{degraded}}">基础合成</view>
       </view>
+      <view class="degraded-notice" wx:if="{{degraded}}">AI 动作生成未完成，本图使用预设角色素材</view>
       <view class="polaroid-caption">
         <view class="caption-name">{{characterName}}</view>
         <view class="caption-quote">「{{quote}}」</view>

@@ -23,7 +23,7 @@ server/services/ai/        运行时：blend + diary + providers
 | `AI_MODE` | 行为 |
 |-----------|------|
 | `mock` | 使用默认动作和位置完成本地素材合成；日记用 fallback 文案 |
-| `live` | Seedream 生成场景互动候选图和角色蒙版，本地恢复原背景；日记走 DeepSeek 多模态 |
+| `live` | Seedream Pro 生成一次场景互动候选图，U2Net-P 本地分割角色并恢复原背景；日记走 DeepSeek 多模态 |
 
 **`.env` 示例**（Key 自行填入，勿提交）：
 
@@ -45,15 +45,15 @@ AI_DIARY_MODEL=deepseek-flash
 PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-`hybrid` 模式需要 `AI_API_KEY`。候选图生成、蒙版生成或完整性校验任一步失败时，系统自动使用透明动作素材继续完成合成，不会返回被整图重绘的候选图。
+`hybrid` 模式需要 `AI_API_KEY`、Python、Pillow、NumPy、ONNX Runtime 和 `models/u2netp.onnx`。失败时默认返回透明动作素材，同时用 `degraded`、`failedStage` 和 `fallbackReason` 明确标记；设置 `AI_ALLOW_ASSET_FALLBACK=false` 可改为直接返回错误。
 
 | `AI_BLEND_STRATEGY` | 行为 |
 |---------------------|------|
-| `hybrid`（默认） | Seedream 生成完整互动效果和角色蒙版；Sharp 只提取角色并恢复原始背景 |
+| `hybrid`（默认） | Seedream Pro 生成互动候选；U2Net-P 本地分割，Sharp 恢复原始背景 |
 | `asset-composite` | DeepSeek 选择透明动作素材，Sharp 直接合成，不生成新动作 |
 | `seedream-full` | 保留旧 Seedream 整图编辑路径；不能保证背景像素不变 |
 
-Seedream 候选图/蒙版：`providers/http.js` · 背景恢复与合成：`compositor.js` · 场景分析/日记：`providers/deepseek.js`。**密钥勿写进代码**。
+Seedream 候选图：`providers/http.js` · 本地分割：`segmenter.js` / `scripts/segment_foreground.py` · 背景恢复与合成：`compositor.js` · 场景分析/日记：`providers/deepseek.js`。**密钥勿写进代码**。
 
 ## 安全
 

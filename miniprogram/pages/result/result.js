@@ -10,6 +10,8 @@ Page({
     characterId: '',
     characterImage: '',
     sourceImagePath: '',
+    degraded: false,
+    failedStage: '',
     isHistoryView: false
   },
 
@@ -22,6 +24,8 @@ Page({
       characterId: options.characterId || character.characterId,
       characterImage: decodeURIComponent(options.characterImage || '') || character.image,
       sourceImagePath: decodeURIComponent(options.sourceImagePath || ''),
+      degraded: options.degraded === '1',
+      failedStage: decodeURIComponent(options.failedStage || ''),
       isHistoryView: options.from === 'history'
     })
   },

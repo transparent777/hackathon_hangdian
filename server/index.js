@@ -127,7 +127,10 @@ app.post('/api/blend', (req, res) => {
         resultUrl: blendResult.resultUrl,
         blended: blendResult.blended !== false,
         blendProvider: blendResult.provider || 'unknown',
-        backgroundPreserved: blendResult.provider !== 'volcengine-seedream-5-pro-edit',
+        backgroundPreserved: Boolean(blendResult.backgroundPreserved),
+        degraded: Boolean(blendResult.degraded),
+        failedStage: blendResult.failedStage || null,
+        fallbackReason: blendResult.degraded ? blendResult.fallbackReason || 'AI 生成失败' : null,
         companionText: pickQuote(characterId),
         diaryNote: diaryResult.diaryNote,
         fontStyle: diaryResult.fontStyle,
@@ -142,7 +145,8 @@ app.post('/api/blend', (req, res) => {
       log.error('blend failed', err)
       const detail = err?.message ? String(err.message).slice(0, 120) : ''
       res.status(500).json({
-        message: detail && !detail.includes('溶图') ? `溶图失败：${detail}` : '溶图处理失败，请稍后重试'
+        message: detail && !detail.includes('溶图') ? `溶图失败：${detail}` : '溶图处理失败，请稍后重试',
+        failedStage: err?.stage || null
       })
     }
   })

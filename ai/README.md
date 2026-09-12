@@ -21,8 +21,9 @@
 server/services/ai/blend.js  ──读──► ai/prompts/{id}.json
         │
         ▼
-providers/http.js     Seedream 生成场景互动候选图，再生成角色黑白蒙版
-compositor.js         只提取候选图中的角色，覆盖回原始照片并校验背景像素
+providers/http.js     Seedream Pro 生成一次场景互动候选图
+segmenter.js          U2Net-P 本地生成角色前景蒙版
+compositor.js         提取候选图中的角色，覆盖回原始照片并校验背景像素
 scene.js              asset-composite 回退时选择透明动作、落脚点和比例
         │
         ▼
@@ -62,7 +63,7 @@ PUBLIC_BASE_URL=http://localhost:3000
 
 | variant | 模型 ID | 说明 |
 |---------|---------|------|
-| `pro`（默认） | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，候选图与角色蒙版生成 |
+| `pro`（hybrid 固定） | `doubao-seedream-5-0-pro-260628` | 5.0 Pro，候选图生成 |
 | `lite` | `doubao-seedream-5-0-260128` | 5.0 Lite，组图候选生成 |
 | `4.5` | `doubao-seedream-4-5-251128` | 旧版兼容 |
 

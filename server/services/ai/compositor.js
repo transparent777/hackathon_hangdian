@@ -23,9 +23,11 @@ function shadowSvg(width, height, opacity) {
   )
 }
 
-function largestComponent(binary, width, height) {
+function largestComponent(binary, width, height, focus = null) {
   const queue = new Int32Array(binary.length)
-  let best = null
+  let largest = null
+  let focused = null
+  const minFocusedSize = Math.max(16, Math.round(width * height * 0.003))
 
   for (let start = 0; start < binary.length; start += 1) {
     if (binary[start] === 0) continue
@@ -66,16 +68,25 @@ function largestComponent(binary, width, height) {
       }
     }
 
-    if (!best || tail > best.size) {
-      best = {
+    const bounds = { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
+    const centerX = bounds.x + bounds.width / 2
+    const centerY = bounds.y + bounds.height / 2
+    const distance = focus ? Math.hypot(centerX - focus.x, centerY - focus.y) : 0
+    const candidate = {
         size: tail,
         pixels: queue.slice(0, tail),
-        bounds: { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
-      }
+        bounds,
+        distance
     }
+    if (!largest || candidate.size > largest.size) largest = candidate
+    if (
+      focus &&
+      candidate.size >= minFocusedSize &&
+      (!focused || candidate.distance < focused.distance)
+    ) focused = candidate
   }
 
-  return best
+  return focus ? focused || largest : largest
 }
 
 function borderMean(data, width, height) {
@@ -92,7 +103,7 @@ function borderMean(data, width, height) {
   return count ? total / count : 0
 }
 
-async function normalizeGeneratedMask(maskImagePath, width, height) {
+async function normalizeGeneratedMask(maskImagePath, width, height, focus = null, allowedBounds = null) {
   const raw = await sharp(maskImagePath)
     .rotate()
     .resize(width, height, { fit: 'fill' })
@@ -103,10 +114,12 @@ async function normalizeGeneratedMask(maskImagePath, width, height) {
   const binary = new Uint8Array(raw.length)
   for (let i = 0; i < raw.length; i += 1) {
     const value = invert ? 255 - raw[i] : raw[i]
-    binary[i] = value >= 160 ? 1 : 0
+    const x = i % width
+    const y = Math.floor(i / width)
+    binary[i] = value >= 160 && (!allowedBounds || inBounds(x, y, allowedBounds)) ? 1 : 0
   }
 
-  const component = largestComponent(binary, width, height)
+  const component = largestComponent(binary, width, height, focus)
   if (!component) throw new Error('角色蒙版中没有可用前景')
   const ratio = component.size / (width * height)
   if (ratio < 0.005 || ratio > 0.5) {
@@ -122,13 +135,15 @@ async function normalizeGeneratedMask(maskImagePath, width, height) {
     .dilate(1)
     .blur(0.8)
     .raw()
-    .toBuffer()
+    .toBuffer({ resolveWithObject: true })
   const bounds = expandBounds(component.bounds, 4, width, height)
   const rgba = Buffer.alloc(width * height * 4, 255)
-  for (let i = 0; i < softened.length; i += 1) {
+  for (let i = 0; i < width * height; i += 1) {
     const x = i % width
     const y = Math.floor(i / width)
-    rgba[i * 4 + 3] = inBounds(x, y, bounds) ? softened[i] : 0
+    rgba[i * 4 + 3] = inBounds(x, y, bounds)
+      ? softened.data[i * softened.info.channels]
+      : 0
   }
   const buffer = await sharp(rgba, { raw: { width, height, channels: 4 } }).png().toBuffer()
 
@@ -270,7 +285,9 @@ async function composeGeneratedCharacter({
   sourceImagePath,
   candidateImagePath,
   maskImagePath,
-  uploadDir
+  uploadDir,
+  focus,
+  allowedBounds
 }) {
   const background = await sharp(sourceImagePath)
     .rotate()
@@ -279,7 +296,7 @@ async function composeGeneratedCharacter({
     .toBuffer({ resolveWithObject: true })
   const width = background.info.width
   const height = background.info.height
-  const mask = await normalizeGeneratedMask(maskImagePath, width, height)
+  const mask = await normalizeGeneratedMask(maskImagePath, width, height, focus, allowedBounds)
   const candidate = await sharp(candidateImagePath)
     .rotate()
     .resize(width, height, { fit: 'fill' })

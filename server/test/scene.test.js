@@ -34,7 +34,7 @@ test('normalizes a scene plan and rejects unknown variants', () => {
 test('uses profile defaults when scene analysis is unavailable', () => {
   const plan = buildFallbackScenePlan(profile)
   assert.equal(plan.variantId, 'calm')
-  assert.deepEqual(plan.anchor, { x: 0.5, y: 0.88 })
+  assert.deepEqual(plan.anchor, { x: 0.5, y: 0.82 })
   assert.equal(plan.scale, 0.24)
 })
 
