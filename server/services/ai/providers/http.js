@@ -16,13 +16,21 @@ function resolveArkBaseUrl(config) {
   return (config.apiBaseUrl || DEFAULT_ARK_BASE).replace(/\/$/, '')
 }
 
-function buildBlendPrompt(promptText) {
-  return [
-    '将虚拟陪伴兽自然融入用户真实生活照片中，保持场景光线与透视一致，半写实合成，无水印无文字。',
-    promptText
-  ]
-    .filter(Boolean)
-    .join(' ')
+function buildBlendPrompt(promptText, negativePrompt = '') {
+  const global = [
+    '图1是用户真实生活照片，作为场景底图，必须完整保留场景、构图、透视与原有物体。',
+    '图2是该角色官方参考素材，角色外观的唯一依据，必须高保真还原其造型、比例、配色与画风，不得按文字描述重新绘制。',
+    '将图2中的陪伴兽自然合成进图1：允许根据场景调整姿势、表情、朝向、大小与落点，光影与接触阴影须与场景一致。',
+    '禁止改变角色辨识度特征、禁止遮挡人脸与画面主体、禁止整图重绘为插画风格。',
+    '半写实合成，边缘清晰自然，无水印无文字。'
+  ].join(' ')
+
+  const parts = [global, promptText].filter(Boolean)
+  const forbidden = String(negativePrompt || '').trim()
+  if (forbidden) {
+    parts.push(`禁止出现：${forbidden.replace(/,/g, '、')}`)
+  }
+  return parts.join(' ')
 }
 
 function collectReferenceImages(sourceImagePath, referenceImagePath) {
@@ -84,6 +92,7 @@ async function blendImage(ctx) {
   const {
     config,
     promptText,
+    negativePrompt,
     referenceImagePath,
     sourceImagePath,
     publicBaseUrl,
@@ -104,7 +113,7 @@ async function blendImage(ctx) {
   const model = config.blendModel || DEFAULT_BLEND_MODEL
   const body = buildSeedreamBody({
     model,
-    prompt: buildBlendPrompt(promptText),
+    prompt: buildBlendPrompt(promptText, negativePrompt),
     images
   })
 
