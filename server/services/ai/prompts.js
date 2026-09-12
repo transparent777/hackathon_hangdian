@@ -72,7 +72,6 @@ function loadBlendPrompt(characterId) {
       negativePrompt: '',
       strength: 0.65
     },
-    rarityModifiers: {},
     _source: 'builtin'
   }
   blendPromptCache.set(id, entry)
@@ -86,11 +85,9 @@ function getBlendPromptSource(characterId) {
   return loadBlendPrompt(characterId)._source || 'authored'
 }
 
-function buildBlendPromptText(characterId, rarityLabel = '普通') {
+function buildBlendPromptText(characterId) {
   const cfg = loadBlendPrompt(characterId)
-  const modifier = cfg.rarityModifiers?.[rarityLabel] || cfg.rarityModifiers?.['普通'] || ''
-  const base = cfg.blend?.prompt || ''
-  return [base, modifier].filter(Boolean).join(' ')
+  return cfg.blend?.prompt || ''
 }
 
 function resolveReferenceImagePath(characterId) {

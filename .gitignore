@@ -143,11 +143,16 @@ coverage/
 .nyc_output/
 
 # =========================
-# 素材库（本地源文件，整目录不提交 Git）
+# 素材库 & 溶图参考图（本地源文件，不进 Git）
 # =========================
-# 含：封面视频、主页 banner、陪伴兽原图、参考模板等
-# 小程序实际用的是 miniprogram/images/ 与 miniprogram/assets/ 里的副本
+# 素材库：封面视频、主页 banner、陪伴兽原图、溶图多角度素材等
+# 同步脚本：scripts/sync_assets.py · scripts/sync_blend_assets.py
 素材库/
+
+# 溶图 API 参考图（从 素材库/溶图 同步到本地；仅保留 README 说明）
+ai/references/**
+!ai/references/
+!ai/references/README.md
 
 # 开场视频高清源（本地备份，不提交）
 miniprogram/assets/splash/intro-source-*.mp4
