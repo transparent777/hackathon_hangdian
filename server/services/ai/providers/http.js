@@ -7,6 +7,7 @@ const path = require('path')
 const { fileToDataUri, downloadImageToDir } = require('../image-utils')
 const { resolveBlendSize } = require('../config')
 const { fetchJson } = require('../http')
+const { log } = require('../log')
 
 const DEFAULT_ARK_BASE = 'https://ark.cn-beijing.volces.com'
 const DEFAULT_BLEND_MODEL = 'doubao-seedream-5-0-260128'
@@ -18,10 +19,10 @@ function resolveArkBaseUrl(config) {
 
 function buildBlendPrompt(promptText, negativePrompt = '') {
   const global = [
-    '图1是用户真实生活照片，作为场景底图，必须完整保留场景、构图、透视与原有物体。',
-    '图2是该角色官方参考素材，角色外观的唯一依据，必须高保真还原其造型、比例、配色与画风，不得按文字描述重新绘制。',
-    '将图2中的陪伴兽自然合成进图1：允许根据场景调整姿势、表情、朝向、大小与落点，光影与接触阴影须与场景一致。',
-    '禁止改变角色辨识度特征、禁止遮挡人脸与画面主体、禁止整图重绘为插画风格。',
+    '图1是用户真实生活照片，作为场景底图，保留原场景结构、透视与光线基调，不要替换或重绘背景。',
+    '图2是该角色官方参考素材，角色外观的唯一依据，必须高保真还原其造型、比例、配色与画风。',
+    '任务：把图2中的陪伴兽清晰合成进图1，最终成图中必须能看见陪伴兽本体；可放在桌沿、沙发角或前景空白处，允许调整姿势、表情、朝向与大小以融入场景。',
+    '陪伴兽约占画面八分之一到四分之一，优先放在边角，尽量不遮挡人脸；光影与接触阴影须与场景一致。',
     '半写实合成，边缘清晰自然，无水印无文字。'
   ].join(' ')
 
@@ -109,8 +110,19 @@ async function blendImage(ctx) {
   if (!images.length) {
     throw new Error('缺少用户原图，无法溶图')
   }
+  if (images.length < 2) {
+    log.warn('溶图缺少角色参考图，仅上传用户原图', {
+      referenceImagePath,
+      characterId: ctx.characterId
+    })
+  }
 
   const model = config.blendModel || DEFAULT_BLEND_MODEL
+  log.info('seedream blend request', {
+    characterId: ctx.characterId,
+    imageCount: images.length,
+    model
+  })
   const body = buildSeedreamBody({
     model,
     prompt: buildBlendPrompt(promptText, negativePrompt),
