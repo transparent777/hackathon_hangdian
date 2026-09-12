@@ -33,7 +33,7 @@ AI_MODE=live
 # 溶图 · 火山方舟
 AI_API_KEY=你的火山方舟密钥
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
-AI_BLEND_VARIANT=lite
+AI_BLEND_VARIANT=pro
 AI_BLEND_SIZE=2K
 
 # 日记批注 · DeepSeek V4.1-Flash
@@ -46,8 +46,8 @@ PUBLIC_BASE_URL=http://localhost:3000
 
 | `AI_BLEND_VARIANT` | 溶图模型 |
 |--------------------|------|
-| `lite`（默认） | `doubao-seedream-5-0-260128` |
-| `pro` | `doubao-seedream-5-0-pro-260628` |
+| `pro`（默认） | `doubao-seedream-5-0-pro-260628` |
+| `lite` | `doubao-seedream-5-0-260128` |
 
 溶图：`providers/http.js` · 日记：`providers/deepseek.js`。**密钥勿写进代码**。
 

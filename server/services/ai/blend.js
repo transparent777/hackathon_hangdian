@@ -31,7 +31,7 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
     rarityLabel,
     promptText,
     negativePrompt: blendCfg.blend?.negativePrompt || '',
-    strength: blendCfg.blend?.strength,
+    editRegion: blendCfg.blend?.editRegion || null,
     referenceImagePath,
     sourceImagePath: sourceFile.path,
     publicResultPath,

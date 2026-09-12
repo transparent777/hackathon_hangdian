@@ -18,13 +18,13 @@
         "id": "doubao-seedream-5-0-260128",
         "label": "Seedream 5.0 Lite",
         "sizes": ["2K", "3K", "4K"],
-        "notes": "支持组图；溶图默认推荐"
+        "notes": "支持组图；不支持交互编辑溶图"
       },
       "pro": {
         "id": "doubao-seedream-5-0-pro-260628",
         "label": "Seedream 5.0 Pro",
         "sizes": ["1K", "2K"],
-        "notes": "画质更好；多图融合 2~10 张；不支持组图"
+        "notes": "溶图方案 A 默认；单图交互编辑 + 坐标区域"
       },
       "4.5": {
         "id": "doubao-seedream-4-5-251128",
@@ -33,7 +33,7 @@
         "notes": "兼容保留"
       }
     },
-    "defaultVariant": "lite"
+    "defaultVariant": "pro"
   },
   "providers": {
     "mock": {
