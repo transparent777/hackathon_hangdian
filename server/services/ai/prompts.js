@@ -1,3 +1,4 @@
+const fs = require('fs')
 const path = require('path')
 const { AI_ROOT } = require('./config')
 const { readJson } = require('./read-json')
@@ -93,7 +94,41 @@ function buildBlendPromptText(characterId) {
 function resolveReferenceImagePath(characterId) {
   const cfg = loadBlendPrompt(characterId)
   const rel = cfg.referenceImage || `references/${characterId}.jpg`
-  return path.join(AI_ROOT, rel)
+  const candidates = [
+    path.join(AI_ROOT, rel),
+    path.join(AI_ROOT, 'references', `${characterId}.jpg`),
+    path.join(AI_ROOT, 'references', `${characterId}.png`)
+  ]
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) {
+      return candidate
+    }
+  }
+
+  const manifestPath = path.join(AI_ROOT, 'references', 'manifest.json')
+  const manifest = readJson(manifestPath)
+  const marked = manifest?.characters?.[characterId]?.variants?.find((item) => item.isPrimary)
+  if (marked?.file) {
+    const fromManifest = path.join(AI_ROOT, 'references', marked.file)
+    if (fs.existsSync(fromManifest)) {
+      return fromManifest
+    }
+  }
+
+  const variantsDir = path.join(AI_ROOT, 'references', 'variants', characterId)
+  if (fs.existsSync(variantsDir)) {
+    const files = fs
+      .readdirSync(variantsDir)
+      .filter((name) => /\.(jpe?g|png|webp)$/i.test(name))
+      .sort()
+    if (files.length) {
+      return path.join(variantsDir, files[0])
+    }
+  }
+
+  log.warn('未找到角色参考图', { characterId, expected: candidates[0] })
+  return candidates[0]
 }
 
 function getDiaryPromptBundle(characterId, rarityLabel) {

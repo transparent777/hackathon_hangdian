@@ -30,6 +30,13 @@ CHAR_ID_TO_CN = {
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp"}
 
+# 无现成主参考图时，从 variants 默认选一张复制为 references/{id}.jpg
+DEFAULT_PRIMARY_VARIANT = {
+    "naiwa": "01.jpg",
+    "doro": "08.jpg",
+    "maodie": "04.jpg",
+}
+
 
 def file_hash(path: Path) -> str:
     digest = hashlib.sha256()
@@ -72,6 +79,30 @@ def rename_source_folders(mapping: dict[str, Path]) -> None:
             raise RuntimeError(f"目标目录已存在: {target}")
         folder.rename(target)
         print(f"  renamed: {folder.name} -> {cid}/")
+
+
+def ensure_primary_reference(cid: str, out_dir: Path, variants: list[dict]) -> None:
+    primary_path = AI_REFS / f"{cid}.jpg"
+    if primary_path.exists():
+        print(f"  keep primary: {primary_path.relative_to(ROOT)}")
+        return
+
+    marked = next((v for v in variants if v.get("isPrimary")), None)
+    if marked:
+        src = AI_REFS / marked["file"]
+    else:
+        fallback = DEFAULT_PRIMARY_VARIANT.get(cid)
+        src = out_dir / fallback if fallback else None
+        if not src or not src.exists():
+            files = sorted([p for p in out_dir.iterdir() if p.is_file()])
+            src = files[0] if files else None
+
+    if not src or not src.exists():
+        print(f"  warn: cannot create primary for {cid}")
+        return
+
+    shutil.copy2(src, primary_path)
+    print(f"  primary: {primary_path.relative_to(ROOT)} (from {src.name})")
 
 
 def copy_variants(mapping: dict[str, Path]) -> dict:
@@ -119,6 +150,15 @@ def copy_variants(mapping: dict[str, Path]) -> dict:
             )
             flag = " [primary]" if is_primary else ""
             print(f"  ok: {dst.relative_to(ROOT)} ({dst.stat().st_size // 1024} KB){flag}")
+
+        ensure_primary_reference(cid, out_dir, variants)
+
+        primary_path = AI_REFS / f"{cid}.jpg"
+        if primary_path.exists():
+            primary_hash = file_hash(primary_path)
+            for item in variants:
+                src = AI_REFS / item["file"]
+                item["isPrimary"] = file_hash(src) == primary_hash
 
         manifest["characters"][cid] = {
             "name": CHAR_ID_TO_CN[cid],
