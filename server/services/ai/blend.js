@@ -126,9 +126,15 @@ async function runBlend({ characterId, rarityLabel, sourceFile, publicBaseUrl, d
   let result
   if (config.blendStrategy === 'seedream-full') {
     const provider = getProvider(config)
-    result = await withSlot({ deadline, waitMs: Math.min(5000, timeoutMs) }, () =>
-      provider.blendImage(ctx)
+    const candidate = await runStage('candidate_generation', () =>
+      withSlot({ deadline, waitMs: Math.min(5000, timeoutMs) }, () => provider.blendImage(ctx))
     )
+    result = {
+      ...candidate,
+      degraded: false,
+      backgroundPreserved: false,
+      fallbackKind: null
+    }
   } else if (config.blendStrategy === 'asset-composite' || !config.isLive) {
     result = await runAssetComposite({
       config,

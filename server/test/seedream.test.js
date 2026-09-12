@@ -1,7 +1,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const { buildSeedreamBody, resolveSceneEditRegion } = require('../services/ai/providers/http')
-const { resolveBlendModel } = require('../services/ai/config')
+const { loadAiRuntimeConfig, resolveBlendModel } = require('../services/ai/config')
 const { expandRegion } = require('../services/ai/segmenter')
 
 test('sends the scene and character reference as ordered images without a watermark', () => {
@@ -32,6 +32,18 @@ test('hybrid strategy always resolves to Seedream Pro', () => {
     else process.env.AI_BLEND_STRATEGY = previousStrategy
     if (previousVariant === undefined) delete process.env.AI_BLEND_VARIANT
     else process.env.AI_BLEND_VARIANT = previousVariant
+  }
+})
+
+test('uses direct Seedream candidate output as the default blend strategy', () => {
+  const previousStrategy = process.env.AI_BLEND_STRATEGY
+  delete process.env.AI_BLEND_STRATEGY
+  try {
+    const config = loadAiRuntimeConfig()
+    assert.equal(config.blendStrategy, 'seedream-full')
+    assert.equal(config.blendModel, 'doubao-seedream-5-0-pro-260628')
+  } finally {
+    if (previousStrategy !== undefined) process.env.AI_BLEND_STRATEGY = previousStrategy
   }
 })
 

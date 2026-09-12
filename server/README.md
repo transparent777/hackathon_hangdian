@@ -23,15 +23,15 @@ server/services/ai/        运行时：blend + diary + providers
 | `AI_MODE` | 行为 |
 |-----------|------|
 | `mock` | 使用默认动作和位置完成本地素材合成；日记用 fallback 文案 |
-| `live` | Seedream Pro 生成一次场景互动候选图，U2Net-P 本地分割角色并恢复原背景；日记走 DeepSeek 多模态 |
+| `live` | Seedream Pro 生成并直接返回场景互动候选图；日记走 DeepSeek 多模态 |
 
 **`.env` 示例**（Key 自行填入，勿提交）：
 
 ```env
 AI_MODE=live
-AI_BLEND_STRATEGY=hybrid
+AI_BLEND_STRATEGY=seedream-full
 
-# 旧整图 Seedream 兼容策略（仅 AI_BLEND_STRATEGY=seedream-full 时使用）
+# Seedream 候选图生成配置
 AI_API_KEY=你的火山方舟密钥
 AI_API_BASE_URL=https://ark.cn-beijing.volces.com
 AI_BLEND_VARIANT=pro
@@ -49,9 +49,9 @@ PUBLIC_BASE_URL=http://localhost:3000
 
 | `AI_BLEND_STRATEGY` | 行为 |
 |---------------------|------|
-| `hybrid`（默认） | Seedream Pro 生成互动候选；U2Net-P 本地分割，Sharp 恢复原始背景 |
+| `seedream-full`（默认） | 直接返回 Seedream 完整候选图；角色融合最好，背景可能被轻微重绘 |
+| `hybrid` | Seedream Pro 生成互动候选；U2Net-P 本地分割，Sharp 恢复原始背景 |
 | `asset-composite` | DeepSeek 选择透明动作素材，Sharp 直接合成，不生成新动作 |
-| `seedream-full` | 保留旧 Seedream 整图编辑路径；不能保证背景像素不变 |
 
 Seedream 候选图：`providers/http.js` · 本地分割：`segmenter.js` / `scripts/segment_foreground.py` · 背景恢复与合成：`compositor.js` · 场景分析/日记：`providers/deepseek.js`。**密钥勿写进代码**。
 

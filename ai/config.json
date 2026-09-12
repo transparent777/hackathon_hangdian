@@ -1,7 +1,7 @@
 {
   "_readme": "非敏感 AI 默认参数。密钥、基址见 server/.env.example。",
   "blend": {
-    "defaultStrategy": "hybrid",
+    "defaultStrategy": "seedream-full",
     "timeoutMs": 90000,
     "maxRetries": 1
   },
@@ -24,7 +24,7 @@
         "id": "doubao-seedream-5-0-pro-260628",
         "label": "Seedream 5.0 Pro",
         "sizes": ["1K", "2K"],
-        "notes": "支持图像编辑；hybrid 流程只采纳候选图中的角色"
+        "notes": "支持图像编辑；默认直接返回完整候选图，hybrid 流程只采纳其中的角色"
       },
       "4.5": {
         "id": "doubao-seedream-4-5-251128",

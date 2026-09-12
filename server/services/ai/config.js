@@ -7,7 +7,11 @@ const aiDefaults = readJson(path.join(ROOT, 'ai/config.json')) || {}
 const SEEDREAM_MODELS = aiDefaults.seedream?.models || {}
 
 function resolveBlendModel() {
-  const strategy = (process.env.AI_BLEND_STRATEGY || aiDefaults.blend?.defaultStrategy || 'hybrid').toLowerCase()
+  const strategy = (
+    process.env.AI_BLEND_STRATEGY ||
+    aiDefaults.blend?.defaultStrategy ||
+    'seedream-full'
+  ).toLowerCase()
   if (strategy === 'hybrid') {
     return SEEDREAM_MODELS.pro?.id || 'doubao-seedream-5-0-pro-260628'
   }
@@ -70,7 +74,10 @@ function loadAiRuntimeConfig() {
     'https://api.deepseek.com'
   ).replace(/\/$/, '')
   const diaryModel = process.env.AI_DIARY_MODEL || aiDefaults.diary?.model || 'deepseek-flash'
-  const blendStrategy = envStr('AI_BLEND_STRATEGY', aiDefaults.blend?.defaultStrategy || 'hybrid').toLowerCase()
+  const blendStrategy = envStr(
+    'AI_BLEND_STRATEGY',
+    aiDefaults.blend?.defaultStrategy || 'seedream-full'
+  ).toLowerCase()
 
   return {
     mode,

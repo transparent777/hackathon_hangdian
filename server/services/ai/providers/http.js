@@ -1,6 +1,6 @@
 /**
  * 火山方舟 · Seedream 候选图生成。
- * 默认 hybrid 流程不会直接返回候选图，而是本地提取角色后覆盖回原始照片。
+ * 默认 seedream-full 流程直接返回候选图；hybrid 流程会提取角色后覆盖回原始照片。
  * 文档：https://www.volcengine.com/docs/82379
  */
 const path = require('path')
