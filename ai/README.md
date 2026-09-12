@@ -9,7 +9,7 @@
 | `prompts/*.json` | 溶图 prompt（三角色） | A/B 填占位 → 联调时调优 |
 | `diary-prompts.json` | 陪伴日记多模态批注 prompt | 已冻结，仅改错别字 |
 | `quotes.json` | roll / 陪伴语池 | 润色文案 |
-| `references/` | 角色参考图（给溶图 API） | 从 `素材库/` 整理 |
+| `references/` | 溶图主参考图 + `variants/` 扩展素材 | `python scripts/sync_blend_assets.py` |
 | `config.json` | 模型名、超时等非敏感默认项 | 与 `.env` 配合 |
 
 ## 数据流
